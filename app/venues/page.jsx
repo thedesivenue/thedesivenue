@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { supabase } from '../../lib/supabase'
 
 const filters = [
   'Mandap allowed',
@@ -14,48 +15,34 @@ const filters = [
   'DJ allowed',
 ]
 
-const mockVenues = [
-  {
-    id: 1,
-    name: 'Royal Banquet Hall',
-    city: 'Edison',
-    min_capacity: 100,
-    max_capacity: 500,
-    min_price: 8000,
-    tags: ['Mandap allowed', 'Veg kitchen', 'Fire ceremony'],
-  },
-  {
-    id: 2,
-    name: 'Grand Celebration',
-    city: 'Iselin',
-    min_capacity: 50,
-    max_capacity: 300,
-    min_price: 5500,
-    tags: ['Fire ceremony', 'Baraat friendly', 'DJ allowed'],
-  },
-  {
-    id: 3,
-    name: 'Sapphire Palace',
-    city: 'Woodbridge',
-    min_capacity: 200,
-    max_capacity: 800,
-    min_price: 12000,
-    tags: ['Mandap allowed', 'Outside catering', 'Late night events'],
-  },
-  {
-    id: 4,
-    name: 'The Heritage Hall',
-    city: 'Piscataway',
-    min_capacity: 80,
-    max_capacity: 250,
-    min_price: 4000,
-    tags: ['Veg kitchen', 'Multi-day events', 'Mandap allowed'],
-  },
-]
-
 export default function VenuesPage() {
+  const [venues, setVenues] = useState([])
+  const [loading, setLoading] = useState(true)
   const [activeFilters, setActiveFilters] = useState([])
   const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    fetchVenues()
+  }, [])
+
+  const fetchVenues = async () => {
+    setLoading(true)
+    const { data, error } = await supabase
+      .from('venues')
+      .select(`
+        *,
+        venue_features(*),
+        venue_images(*)
+      `)
+      .eq('is_approved', true)
+
+    if (error) {
+      console.error('Error fetching venues:', error)
+    } else {
+      setVenues(data || [])
+    }
+    setLoading(false)
+  }
 
   const toggleFilter = (filter) => {
     setActiveFilters((prev) =>
@@ -63,13 +50,29 @@ export default function VenuesPage() {
     )
   }
 
-  const filtered = mockVenues.filter((venue) => {
+  const filterKeyMap = {
+    'Mandap allowed': 'mandap_allowed',
+    'Fire ceremony': 'fire_ceremony',
+    'Veg kitchen': 'vegetarian_kitchen',
+    'Outside catering': 'outside_catering',
+    'Baraat friendly': 'baraat_friendly',
+    'Multi-day events': 'multi_day_events',
+    'Late night events': 'late_night_events',
+    'DJ allowed': 'dj_allowed',
+  }
+
+  const filtered = venues.filter((venue) => {
     const matchesSearch =
       venue.name.toLowerCase().includes(search.toLowerCase()) ||
       venue.city.toLowerCase().includes(search.toLowerCase())
+
     const matchesFilters =
       activeFilters.length === 0 ||
-      activeFilters.every((f) => venue.tags.includes(f))
+      activeFilters.every((f) => {
+        const key = filterKeyMap[f]
+        return venue.venue_features?.[0]?.[key] === true
+      })
+
     return matchesSearch && matchesFilters
   })
 
@@ -113,8 +116,7 @@ export default function VenuesPage() {
             width: '100%', maxWidth: '560px',
             padding: '12px 16px', borderRadius: '8px',
             border: '0.5px solid #d4b97a', fontSize: '15px',
-            background: '#faf8f5', color: '#1a0f3c',
-            outline: 'none'
+            background: '#faf8f5', color: '#1a0f3c', outline: 'none'
           }}
         />
       </section>
@@ -132,8 +134,7 @@ export default function VenuesPage() {
             style={{
               background: activeFilters.includes(filter) ? '#2d1b69' : '#f5f0e8',
               color: activeFilters.includes(filter) ? '#e8d5a3' : '#7a5c2e',
-              fontSize: '13px', padding: '6px 14px',
-              borderRadius: '20px',
+              fontSize: '13px', padding: '6px 14px', borderRadius: '20px',
               border: activeFilters.includes(filter) ? '0.5px solid #2d1b69' : '0.5px solid #d4b97a',
               cursor: 'pointer'
             }}
@@ -146,9 +147,8 @@ export default function VenuesPage() {
             onClick={() => setActiveFilters([])}
             style={{
               background: 'transparent', color: '#9a8aaa',
-              fontSize: '13px', padding: '6px 14px',
-              borderRadius: '20px', border: '0.5px solid #e8e0d5',
-              cursor: 'pointer'
+              fontSize: '13px', padding: '6px 14px', borderRadius: '20px',
+              border: '0.5px solid #e8e0d5', cursor: 'pointer'
             }}
           >
             Clear all
@@ -156,22 +156,24 @@ export default function VenuesPage() {
         )}
       </section>
 
-      {/* Results count */}
+      {/* Results */}
       <section style={{ padding: '16px 32px' }}>
         <p style={{ fontSize: '14px', color: '#9a8aaa' }}>
-          {filtered.length} venue{filtered.length !== 1 ? 's' : ''} found
+          {loading ? 'Loading venues...' : `${filtered.length} venue${filtered.length !== 1 ? 's' : ''} found`}
         </p>
       </section>
 
-      {/* Venue Cards */}
+      {/* Cards */}
       <section style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
         gap: '24px', padding: '0 32px 48px'
       }}>
-        {filtered.length === 0 ? (
+        {loading ? (
+          <p style={{ color: '#9a8aaa', fontSize: '15px' }}>Loading...</p>
+        ) : filtered.length === 0 ? (
           <p style={{ color: '#9a8aaa', fontSize: '15px', gridColumn: '1/-1' }}>
-            No venues match your filters. Try removing some filters.
+            No venues found. Try removing some filters.
           </p>
         ) : (
           filtered.map((venue) => (
@@ -179,14 +181,15 @@ export default function VenuesPage() {
               background: '#ffffff', borderRadius: '12px',
               border: '0.5px solid #e8e0d5', overflow: 'hidden'
             }}>
-              {/* Image placeholder */}
               <div style={{
                 height: '180px',
                 background: 'linear-gradient(135deg, #e8e0f5, #f5e8d5)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: '#9a8aaa', fontSize: '14px'
               }}>
-                Venue photo
+                {venue.venue_images?.[0] ? (
+                  <img src={venue.venue_images[0].url} alt={venue.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : 'Venue photo'}
               </div>
 
               <div style={{ padding: '16px' }}>
@@ -197,21 +200,23 @@ export default function VenuesPage() {
                   {venue.city}, NJ · Up to {venue.max_capacity} guests
                 </p>
 
-                {/* Tags */}
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                  {venue.tags.map((tag) => (
-                    <span key={tag} style={{
-                      background: '#f5f0e8', color: '#7a5c2e',
-                      fontSize: '11px', padding: '3px 8px', borderRadius: '10px'
-                    }}>
-                      {tag}
-                    </span>
-                  ))}
+                  {venue.venue_features?.[0] && Object.entries(venue.venue_features[0])
+                    .filter(([key, val]) => val === true && key !== 'id' && key !== 'venue_id')
+                    .slice(0, 3)
+                    .map(([key]) => (
+                      <span key={key} style={{
+                        background: '#f5f0e8', color: '#7a5c2e',
+                        fontSize: '11px', padding: '3px 8px', borderRadius: '10px'
+                      }}>
+                        {Object.keys(filterKeyMap).find(k => filterKeyMap[k] === key) || key}
+                      </span>
+                    ))}
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '14px', fontWeight: 500, color: '#2d1b69' }}>
-                    From ${venue.min_price.toLocaleString()}
+                    {venue.min_price ? `From $${venue.min_price.toLocaleString()}` : 'Contact for pricing'}
                   </span>
                   <Link href={`/venues/${venue.id}`} style={{
                     background: '#2d1b69', color: '#e8d5a3',

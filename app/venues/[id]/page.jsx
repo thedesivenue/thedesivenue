@@ -1,93 +1,102 @@
 'use client'
-import { use } from 'react'
-import { useState } from 'react'
-import Link from 'next/link'
 
-const mockVenues = [
-  {
-    id: '1',
-    name: 'Royal Banquet Hall',
-    city: 'Edison',
-    address: '123 Oak Tree Rd, Edison, NJ',
-    min_capacity: 100,
-    max_capacity: 500,
-    min_price: 8000,
-    description: 'A spacious banquet hall designed for grand Indian celebrations, with a dedicated mandap setup area and full vegetarian kitchen.',
-    tags: ['Mandap allowed', 'Veg kitchen', 'Fire ceremony', 'Outside catering', 'Baraat friendly'],
-    parking: true,
-    indoor: true,
-    outdoor: false,
-  },
-  {
-    id: '2',
-    name: 'Grand Celebration',
-    city: 'Iselin',
-    address: '456 Green St, Iselin, NJ',
-    min_capacity: 50,
-    max_capacity: 300,
-    min_price: 5500,
-    description: 'An elegant indoor venue perfect for mid-size weddings and cultural events with flexible catering options.',
-    tags: ['Fire ceremony', 'Baraat friendly', 'DJ allowed'],
-    parking: true,
-    indoor: true,
-    outdoor: false,
-  },
-  {
-    id: '3',
-    name: 'Sapphire Palace',
-    city: 'Woodbridge',
-    address: '789 Main St, Woodbridge, NJ',
-    min_capacity: 200,
-    max_capacity: 800,
-    min_price: 12000,
-    description: 'A premium banquet venue with both indoor and outdoor spaces, ideal for large multi-day wedding celebrations.',
-    tags: ['Mandap allowed', 'Outside catering', 'Late night events'],
-    parking: true,
-    indoor: true,
-    outdoor: true,
-  },
-  {
-    id: '4',
-    name: 'The Heritage Hall',
-    city: 'Piscataway',
-    address: '321 River Rd, Piscataway, NJ',
-    min_capacity: 80,
-    max_capacity: 250,
-    min_price: 4000,
-    description: 'A warm and intimate venue suited for poojas, engagements, and smaller family gatherings.',
-    tags: ['Veg kitchen', 'Multi-day events', 'Mandap allowed'],
-    parking: true,
-    indoor: true,
-    outdoor: false,
-  },
-]
+import { useState, useEffect, use } from 'react'
+import Link from 'next/link'
+import { supabase } from '../../../lib/supabase'
 
 export default function VenueDetailPage({ params }) {
   const { id } = use(params)
-  const venue = mockVenues.find((v) => v.id === id)
+  const [venue, setVenue] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [submitted, setSubmitted] = useState(false)
   const [form, setForm] = useState({
     name: '', email: '', phone: '', event_date: '', guest_count: '', message: ''
   })
 
-  if (!venue) {
-    return (
-      <main style={{ padding: '64px', textAlign: 'center' }}>
-        <p>Venue not found.</p>
-        <Link href="/venues" style={{ color: '#2d1b69' }}>Back to venues</Link>
-      </main>
-    )
+  useEffect(() => {
+    fetchVenue()
+  }, [id])
+
+  const fetchVenue = async () => {
+    const { data, error } = await supabase
+      .from('venues')
+      .select(`
+        *,
+        venue_features(*),
+        venue_images(*)
+      `)
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      console.error('Error fetching venue:', error)
+    } else {
+      setVenue(data)
+    }
+    setLoading(false)
   }
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // For now just simulate submission - we'll connect Supabase next
-    setSubmitted(true)
+    const { error } = await supabase
+      .from('inquiries')
+      .insert([{
+        venue_id: venue.id,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        event_date: form.event_date || null,
+        guest_count: form.guest_count ? parseInt(form.guest_count) : null,
+        message: form.message
+      }])
+
+    if (error) {
+      console.error('Error submitting inquiry:', error)
+      alert('Something went wrong. Please try again.')
+    } else {
+      setSubmitted(true)
+    }
   }
+
+  const filterKeyMap = {
+    mandap_allowed: 'Mandap allowed',
+    fire_ceremony: 'Fire ceremony',
+    vegetarian_kitchen: 'Veg kitchen',
+    outside_catering: 'Outside catering',
+    baraat_friendly: 'Baraat friendly',
+    separate_bridal_room: 'Separate bridal room',
+    multi_day_events: 'Multi-day events',
+    late_night_events: 'Late night events',
+    dj_allowed: 'DJ allowed',
+    alcohol_allowed: 'Alcohol allowed',
+  }
+
+  if (loading) {
+    return (
+      <main style={{ padding: '64px', textAlign: 'center', color: '#9a8aaa' }}>
+        Loading venue...
+      </main>
+    )
+  }
+
+  if (!venue) {
+    return (
+      <main style={{ padding: '64px', textAlign: 'center' }}>
+        <p style={{ color: '#9a8aaa', marginBottom: '16px' }}>Venue not found.</p>
+        <Link href="/venues" style={{ color: '#2d1b69' }}>← Back to venues</Link>
+      </main>
+    )
+  }
+
+  const activeFeatures = venue.venue_features?.[0]
+    ? Object.entries(venue.venue_features[0])
+        .filter(([key, val]) => val === true && filterKeyMap[key])
+        .map(([key]) => filterKeyMap[key])
+    : []
 
   return (
     <main style={{ minHeight: '100vh', background: '#faf8f5' }}>
@@ -111,9 +120,15 @@ export default function VenueDetailPage({ params }) {
         height: '320px',
         background: 'linear-gradient(135deg, #e8e0f5, #f5e8d5)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: '#9a8aaa', fontSize: '16px'
+        color: '#9a8aaa', fontSize: '16px', overflow: 'hidden'
       }}>
-        Venue photos coming soon
+        {venue.venue_images?.[0] ? (
+          <img
+            src={venue.venue_images[0].url}
+            alt={venue.name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : 'Venue photos coming soon'}
       </div>
 
       <section style={{
@@ -127,7 +142,7 @@ export default function VenueDetailPage({ params }) {
             {venue.name}
           </h1>
           <p style={{ fontSize: '15px', color: '#9a8aaa', marginBottom: '20px' }}>
-            {venue.address}
+            {venue.address}, {venue.city}, {venue.state} {venue.zip}
           </p>
 
           <p style={{ fontSize: '15px', color: '#6b5e8a', lineHeight: 1.7, marginBottom: '24px' }}>
@@ -144,7 +159,7 @@ export default function VenueDetailPage({ params }) {
             <div>
               <p style={{ fontSize: '13px', color: '#9a8aaa' }}>Starting price</p>
               <p style={{ fontSize: '16px', fontWeight: 500, color: '#2d1b69' }}>
-                ${venue.min_price.toLocaleString()}
+                {venue.min_price ? `$${venue.min_price.toLocaleString()}` : 'Contact for pricing'}
               </p>
             </div>
             <div>
@@ -155,20 +170,24 @@ export default function VenueDetailPage({ params }) {
             </div>
           </div>
 
-          <h3 style={{ fontSize: '16px', fontWeight: 500, color: '#1a0f3c', marginBottom: '10px' }}>
-            Cultural features
-          </h3>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {venue.tags.map((tag) => (
-              <span key={tag} style={{
-                background: '#f5f0e8', color: '#7a5c2e',
-                fontSize: '13px', padding: '6px 12px', borderRadius: '20px',
-                border: '0.5px solid #d4b97a'
-              }}>
-                {tag}
-              </span>
-            ))}
-          </div>
+          {activeFeatures.length > 0 && (
+            <>
+              <h3 style={{ fontSize: '16px', fontWeight: 500, color: '#1a0f3c', marginBottom: '10px' }}>
+                Cultural features
+              </h3>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {activeFeatures.map((feature) => (
+                  <span key={feature} style={{
+                    background: '#f5f0e8', color: '#7a5c2e',
+                    fontSize: '13px', padding: '6px 12px', borderRadius: '20px',
+                    border: '0.5px solid #d4b97a'
+                  }}>
+                    {feature}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Right: Inquiry Form */}
@@ -192,37 +211,12 @@ export default function VenueDetailPage({ params }) {
                 Send an inquiry
               </h3>
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <input
-                  name="name" placeholder="Your name" required
-                  value={form.name} onChange={handleChange}
-                  style={inputStyle}
-                />
-                <input
-                  name="email" type="email" placeholder="Email" required
-                  value={form.email} onChange={handleChange}
-                  style={inputStyle}
-                />
-                <input
-                  name="phone" placeholder="Phone"
-                  value={form.phone} onChange={handleChange}
-                  style={inputStyle}
-                />
-                <input
-                  name="event_date" type="date"
-                  value={form.event_date} onChange={handleChange}
-                  style={inputStyle}
-                />
-                <input
-                  name="guest_count" type="number" placeholder="Number of guests"
-                  value={form.guest_count} onChange={handleChange}
-                  style={inputStyle}
-                />
-                <textarea
-                  name="message" placeholder="Tell us about your event..."
-                  value={form.message} onChange={handleChange}
-                  rows={3}
-                  style={{ ...inputStyle, resize: 'none' }}
-                />
+                <input name="name" placeholder="Your name" required value={form.name} onChange={handleChange} style={inputStyle} />
+                <input name="email" type="email" placeholder="Email" required value={form.email} onChange={handleChange} style={inputStyle} />
+                <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} style={inputStyle} />
+                <input name="event_date" type="date" value={form.event_date} onChange={handleChange} style={inputStyle} />
+                <input name="guest_count" type="number" placeholder="Number of guests" value={form.guest_count} onChange={handleChange} style={inputStyle} />
+                <textarea name="message" placeholder="Tell us about your event..." value={form.message} onChange={handleChange} rows={3} style={{ ...inputStyle, resize: 'none' }} />
                 <button type="submit" style={{
                   background: '#2d1b69', color: '#e8d5a3',
                   padding: '12px', borderRadius: '8px',
