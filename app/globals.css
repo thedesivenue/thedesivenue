@@ -1,26 +1,30 @@
-:root {
-  --purple-deep: #2d1b69;
-  --purple-light: #6b5e8a;
-  --purple-pale: #f5f0ff;
-  --gold: #c9a84c;
-  --gold-light: #e8d5a3;
-  --gold-pale: #f5f0e8;
-  --gold-border: #d4b97a;
-  --cream: #faf8f5;
-  --cream-border: #e8e0d5;
-  --text-dark: #1a0f3c;
-  --text-mid: #6b5e8a;
-  --text-muted: #9a8aaa;
-}
+@import "tailwindcss";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@theme {
+  --color-ink: #1a0f3c;
+  --color-plum: #2d1b69;
+  --color-plum-light: #6b5e8a;
+  --color-plum-pale: #f5f0ff;
+  --color-gold: #c9a84c;
+  --color-gold-light: #e8d5a3;
+  --color-gold-pale: #f5f0e8;
+  --color-gold-border: #d4b97a;
+  --color-gold-ink: #7a5c2e;
+  --color-cream: #faf8f5;
+  --color-cream-border: #e8e0d5;
+  --color-muted: #9a8aaa;
+
+  --font-display: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
 body {
-  font-family: var(--font-sans, 'Georgia', serif);
-  background: var(--cream);
-  color: var(--text-dark);
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+.bg-motif {
+  background-image: radial-gradient(circle at 1px 1px, var(--color-gold-border) 1px, transparent 0);
+  background-size: 28px 28px;
 }
