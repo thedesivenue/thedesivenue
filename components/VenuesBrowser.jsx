@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { VenueCard } from '@/components/VenueCard'
+import { Pill } from '@/components/ui/Pill'
 import { CULTURAL_FEATURES } from '@/lib/features'
 
 const listFilters = CULTURAL_FEATURES.slice(0, 8)
@@ -14,7 +15,7 @@ const sortOptions = [
 ]
 
 const selectClass =
-  'rounded-lg border border-cream-border bg-white px-3.5 py-2.5 text-sm text-ink outline-none focus:border-plum'
+  'rounded-sm border border-cream-border bg-white px-3.5 py-2.5 text-sm text-ink outline-none focus:border-plum'
 
 export function VenuesBrowser({ venues }) {
   const [activeFilters, setActiveFilters] = useState([])
@@ -82,7 +83,7 @@ export function VenuesBrowser({ venues }) {
           placeholder="Search by venue name or city..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-xl rounded-lg border border-gold-border bg-cream px-4 py-3 text-[15px] text-ink outline-none placeholder:text-muted focus:border-plum"
+          className="w-full max-w-xl rounded-sm border border-cream-border bg-cream px-4 py-3 text-[15px] text-ink outline-none placeholder:text-muted focus:border-plum"
         />
       </section>
 
@@ -123,22 +124,14 @@ export function VenuesBrowser({ venues }) {
       {/* Cultural filters */}
       <section className="flex flex-wrap items-center gap-2.5 border-b border-cream-border bg-white px-6 py-4">
         {listFilters.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => toggleFilter(key)}
-            className={
-              activeFilters.includes(key)
-                ? 'rounded-full border border-plum bg-plum px-3.5 py-1.5 text-[13px] text-gold-light'
-                : 'rounded-full border border-gold-border bg-gold-pale px-3.5 py-1.5 text-[13px] text-gold-ink hover:border-plum-light'
-            }
-          >
+          <Pill key={key} as="button" onClick={() => toggleFilter(key)} active={activeFilters.includes(key)}>
             {label}
-          </button>
+          </Pill>
         ))}
         {hasActiveFilters && (
           <button
             onClick={clearAll}
-            className="rounded-full border border-cream-border px-3.5 py-1.5 text-[13px] text-muted hover:text-plum"
+            className="rounded-sm border border-transparent px-3.5 py-1.5 text-[11px] uppercase tracking-wide text-muted hover:text-plum"
           >
             Clear all
           </button>

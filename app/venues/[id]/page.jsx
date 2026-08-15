@@ -53,7 +53,7 @@ export default async function VenueDetailPage({ params }) {
         </div>
 
         {/* Image */}
-        <div className="bg-motif flex h-64 items-center justify-center overflow-hidden bg-gradient-to-br from-plum-pale to-gold-pale sm:h-80">
+        <div className="bg-motif flex h-64 items-center justify-center overflow-hidden sm:h-80">
           {venue.venue_images?.[0] ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -70,7 +70,7 @@ export default async function VenueDetailPage({ params }) {
 
           {/* Left: Details */}
           <div>
-            <h1 className="font-display text-3xl font-medium text-ink">{venue.name}</h1>
+            <h1 className="font-display text-4xl font-bold text-ink">{venue.name}</h1>
             <p className="mt-1.5 text-[15px] text-muted">
               {venue.address}, {venue.city}, {venue.state} {venue.zip}
             </p>
@@ -102,10 +102,10 @@ export default async function VenueDetailPage({ params }) {
 
             {activeFeatures.length > 0 && (
               <>
-                <h3 className="mt-10 text-base font-medium text-ink">Cultural features</h3>
+                <h3 className="mt-10 text-[11px] font-semibold uppercase tracking-wider text-ink">Cultural features</h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {activeFeatures.map((feature) => (
-                    <span key={feature} className="rounded-full border border-gold-border bg-gold-pale px-3 py-1.5 text-[13px] text-gold-ink">
+                    <span key={feature} className="rounded-sm border border-gold-border px-3 py-1.5 text-[11px] uppercase tracking-wide text-gold-ink">
                       {feature}
                     </span>
                   ))}
@@ -115,7 +115,7 @@ export default async function VenueDetailPage({ params }) {
           </div>
 
           {/* Right: Inquiry Form */}
-          <div className="h-fit rounded-2xl border border-cream-border bg-white p-6 lg:sticky lg:top-24">
+          <div className="h-fit rounded-sm border border-cream-border bg-white p-6 lg:sticky lg:top-24">
             <InquiryForm venueId={venue.id} venueName={venue.name} />
           </div>
 

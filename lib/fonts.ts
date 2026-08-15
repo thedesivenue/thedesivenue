@@ -1,8 +1,8 @@
-import { Playfair_Display, Inter } from 'next/font/google'
+import { Bodoni_Moda, Inter } from 'next/font/google'
 
-export const playfair = Playfair_Display({
+export const bodoniModa = Bodoni_Moda({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  variable: '--font-bodoni',
   display: 'swap',
 })
 

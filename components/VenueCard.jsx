@@ -12,9 +12,9 @@ export function VenueCard({ venue }) {
   return (
     <Link
       href={`/venues/${venue.id}`}
-      className="group overflow-hidden rounded-2xl border border-cream-border bg-white transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-plum/5"
+      className="group overflow-hidden rounded-sm border border-cream-border bg-white transition hover:border-plum-light hover:shadow-lg hover:shadow-plum/5"
     >
-      <div className="bg-motif relative h-44 overflow-hidden bg-gradient-to-br from-plum-pale to-gold-pale">
+      <div className="bg-motif relative h-44 overflow-hidden">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={image} alt={venue.name} className="h-full w-full object-cover" />
@@ -26,26 +26,26 @@ export function VenueCard({ venue }) {
       </div>
 
       <div className="p-5">
-        <h3 className="font-display text-lg font-medium text-ink">{venue.name}</h3>
-        <p className="mt-1 text-[13px] text-muted">
+        <h3 className="font-display text-lg font-bold text-ink">{venue.name}</h3>
+        <p className="mt-1.5 text-[11px] uppercase tracking-wide text-muted">
           {venue.city}, NJ · Up to {venue.max_capacity} guests
         </p>
 
         {activeFeatures.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {activeFeatures.map(([key]) => (
-              <span key={key} className="rounded-full bg-gold-pale px-2.5 py-1 text-[11px] text-gold-ink">
+              <span key={key} className="rounded-sm border border-gold-border px-2.5 py-1 text-[10px] uppercase tracking-wide text-gold-ink">
                 {FEATURE_LABELS[key]}
               </span>
             ))}
           </div>
         )}
 
-        <div className="mt-4 flex items-center justify-between">
-          <span className="text-sm font-medium text-plum">
+        <div className="mt-4 flex items-center justify-between border-t border-cream-border pt-3.5">
+          <span className="text-[15px] font-bold text-plum">
             {venue.min_price ? `From $${Number(venue.min_price).toLocaleString()}` : 'Contact for pricing'}
           </span>
-          <span className="text-sm font-medium text-gold-ink group-hover:text-plum">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-gold-ink group-hover:text-plum">
             View details →
           </span>
         </div>

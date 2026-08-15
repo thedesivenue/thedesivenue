@@ -41,7 +41,7 @@ export default async function AdminPage() {
                 : []
 
               return (
-                <div key={venue.id} className="rounded-2xl border border-cream-border bg-white p-6">
+                <div key={venue.id} className="rounded-sm border border-cream-border bg-white p-6">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <h2 className="font-display text-lg font-medium text-ink">{venue.name}</h2>
@@ -56,7 +56,7 @@ export default async function AdminPage() {
                       <form action={approveVenue.bind(null, venue.id)}>
                         <button
                           type="submit"
-                          className="rounded-lg bg-plum px-3.5 py-2 text-sm font-medium text-gold-light hover:bg-ink"
+                          className="rounded-sm bg-plum px-3.5 py-2 text-sm font-medium text-gold-light hover:bg-ink"
                         >
                           Approve
                         </button>
@@ -80,7 +80,7 @@ export default async function AdminPage() {
                   {activeFeatures.length > 0 && (
                     <div className="mt-4 flex flex-wrap gap-2">
                       {activeFeatures.map((feature) => (
-                        <span key={feature} className="rounded-full border border-gold-border bg-gold-pale px-3 py-1 text-[12px] text-gold-ink">
+                        <span key={feature} className="rounded-sm border border-gold-border px-3 py-1 text-[11px] uppercase tracking-wide text-gold-ink">
                           {feature}
                         </span>
                       ))}

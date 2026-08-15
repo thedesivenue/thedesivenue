@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { supabase } from '@/lib/supabase'
+import { Pill } from '@/components/ui/Pill'
 import { CULTURAL_FEATURES } from '@/lib/features'
 
 const emptyForm = {
@@ -88,11 +89,11 @@ export default function ListVenuePage() {
       <>
         <Header />
         <main className="flex-1 bg-cream px-6 py-24 text-center">
-          <p className="font-display text-2xl font-medium text-plum">Thank you ✦</p>
+          <p className="font-display text-2xl font-bold text-plum">Thank you ✦</p>
           <p className="mx-auto mt-3 max-w-md text-[15px] text-plum-light">
             Your venue has been submitted for review. We&apos;ll reach out once it&apos;s approved and live on The Desi Venue.
           </p>
-          <Link href="/venues" className="mt-8 inline-block rounded-lg bg-plum px-7 py-3 text-[15px] font-medium text-gold-light hover:bg-ink">
+          <Link href="/venues" className="mt-8 inline-block rounded-sm bg-plum px-7 py-3.5 text-[12px] font-semibold uppercase tracking-wider text-gold-light hover:bg-ink">
             Browse venues
           </Link>
         </main>
@@ -106,7 +107,7 @@ export default function ListVenuePage() {
       <Header />
       <main className="flex-1 bg-cream">
         <section className="border-b border-cream-border bg-white px-6 py-14 text-center">
-          <h1 className="font-display text-3xl font-medium text-ink sm:text-4xl">List your venue free</h1>
+          <h1 className="font-display text-4xl font-bold text-ink sm:text-5xl">List your venue free</h1>
           <p className="mx-auto mt-3 max-w-lg text-[15px] text-plum-light">
             Reach thousands of Indian families planning events in New Jersey. No listing fees, no commission.
           </p>
@@ -114,7 +115,7 @@ export default function ListVenuePage() {
 
         <form onSubmit={handleSubmit} className="mx-auto max-w-2xl px-6 py-12">
 
-          <fieldset className="rounded-2xl border border-cream-border bg-white p-6">
+          <fieldset className="rounded-sm border border-cream-border bg-white p-6">
             <legend className="px-1 text-base font-medium text-ink">Your contact info</legend>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <input name="owner_name" placeholder="Your name" required value={form.owner_name} onChange={handleChange} className={inputClass} />
@@ -123,7 +124,7 @@ export default function ListVenuePage() {
             </div>
           </fieldset>
 
-          <fieldset className="mt-6 rounded-2xl border border-cream-border bg-white p-6">
+          <fieldset className="mt-6 rounded-sm border border-cream-border bg-white p-6">
             <legend className="px-1 text-base font-medium text-ink">Venue details</legend>
             <div className="mt-4 grid gap-4">
               <input name="name" placeholder="Venue name" required value={form.name} onChange={handleChange} className={inputClass} />
@@ -146,22 +147,13 @@ export default function ListVenuePage() {
             </div>
           </fieldset>
 
-          <fieldset className="mt-6 rounded-2xl border border-cream-border bg-white p-6">
+          <fieldset className="mt-6 rounded-sm border border-cream-border bg-white p-6">
             <legend className="px-1 text-base font-medium text-ink">Cultural features</legend>
             <div className="mt-4 flex flex-wrap gap-2">
               {CULTURAL_FEATURES.map(({ key, label }) => (
-                <button
-                  type="button"
-                  key={key}
-                  onClick={() => toggleFeature(key)}
-                  className={
-                    features.includes(key)
-                      ? 'rounded-full border border-plum bg-plum px-3.5 py-1.5 text-[13px] text-gold-light'
-                      : 'rounded-full border border-gold-border bg-gold-pale px-3.5 py-1.5 text-[13px] text-gold-ink'
-                  }
-                >
+                <Pill key={key} as="button" type="button" onClick={() => toggleFeature(key)} active={features.includes(key)}>
                   {label}
-                </button>
+                </Pill>
               ))}
             </div>
           </fieldset>
@@ -171,7 +163,7 @@ export default function ListVenuePage() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-8 w-full rounded-lg bg-plum py-3.5 text-[15px] font-medium text-gold-light transition hover:bg-ink disabled:opacity-60"
+            className="mt-8 w-full rounded-sm bg-plum py-4 text-[12px] font-semibold uppercase tracking-wider text-gold-light transition hover:bg-ink disabled:opacity-60"
           >
             {submitting ? 'Submitting…' : 'Submit venue for review'}
           </button>
@@ -183,4 +175,4 @@ export default function ListVenuePage() {
 }
 
 const inputClass =
-  'w-full rounded-lg border border-cream-border bg-cream px-3.5 py-2.5 text-sm text-ink outline-none placeholder:text-muted focus:border-plum'
+  'w-full rounded-sm border border-cream-border bg-cream px-3.5 py-2.5 text-sm text-ink outline-none placeholder:text-muted focus:border-plum'
