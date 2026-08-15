@@ -36,6 +36,9 @@ const features = [
 export default function Home() {
   return (
     <>
+      <div className="bg-plum px-6 py-2.5 text-center text-[11px] font-semibold uppercase tracking-wider text-gold-light">
+        ✦ Coming soon — we&apos;re putting the finishing touches on The Desi Venue
+      </div>
       <Header />
       <main className="flex-1 bg-cream">
 
