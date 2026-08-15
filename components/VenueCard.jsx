@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { FEATURE_LABELS } from '@/lib/features'
+import { StarRating } from '@/components/ui/StarRating'
 
 export function VenueCard({ venue }) {
   const image = venue.venue_images?.[0]?.url
@@ -8,6 +9,8 @@ export function VenueCard({ venue }) {
         .filter(([key, val]) => val === true && FEATURE_LABELS[key])
         .slice(0, 3)
     : []
+  const reviews = venue.reviews || []
+  const avgRating = reviews.length ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0
 
   return (
     <Link
@@ -30,6 +33,13 @@ export function VenueCard({ venue }) {
         <p className="mt-1.5 text-[11px] uppercase tracking-wide text-muted">
           {venue.city}, NJ · Up to {venue.max_capacity} guests
         </p>
+
+        {reviews.length > 0 && (
+          <div className="mt-2 flex items-center gap-1.5">
+            <StarRating value={avgRating} size="text-xs" />
+            <span className="text-[11px] text-muted">{avgRating.toFixed(1)} ({reviews.length})</span>
+          </div>
+        )}
 
         {activeFeatures.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">

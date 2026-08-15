@@ -16,7 +16,8 @@ export default async function VenuesPage() {
     .select(`
       *,
       venue_features(*),
-      venue_images(*)
+      venue_images(*),
+      reviews(rating)
     `)
     .eq('is_approved', true)
 

@@ -1,11 +1,17 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { InquiryForm } from '@/components/InquiryForm'
 import { BackLink } from '@/components/ui/BackLink'
 import { ImageGallery } from '@/components/ImageGallery'
+import { StarRating } from '@/components/ui/StarRating'
+import { ReviewForm } from '@/components/ReviewForm'
 import { supabase } from '@/lib/supabase'
+import { createClient as createServerSupabase } from '@/lib/supabase/server'
 import { FEATURE_LABELS } from '@/lib/features'
+
+export const dynamic = 'force-dynamic'
 
 async function getVenue(id) {
   const { data, error } = await supabase
@@ -13,7 +19,8 @@ async function getVenue(id) {
     .select(`
       *,
       venue_features(*),
-      venue_images(*)
+      venue_images(*),
+      reviews(*)
     `)
     .eq('id', id)
     .single()
@@ -44,6 +51,13 @@ export default async function VenueDetailPage({ params }) {
         .map(([key]) => FEATURE_LABELS[key])
     : []
 
+  const reviews = [...(venue.reviews || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+  const avgRating = reviews.length ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0
+
+  const serverSupabase = await createServerSupabase()
+  const { data: { user } } = await serverSupabase.auth.getUser()
+  const existingReview = user ? reviews.find((r) => r.user_id === user.id) : null
+
   return (
     <>
       <Header />
@@ -63,6 +77,15 @@ export default async function VenueDetailPage({ params }) {
             <p className="mt-1.5 text-[15px] text-muted">
               {venue.address}, {venue.city}, {venue.state} {venue.zip}
             </p>
+
+            {reviews.length > 0 && (
+              <div className="mt-3 flex items-center gap-2">
+                <StarRating value={avgRating} size="text-base" />
+                <span className="text-[13px] text-muted">
+                  {avgRating.toFixed(1)} ({reviews.length} review{reviews.length !== 1 ? 's' : ''})
+                </span>
+              </div>
+            )}
 
             <p className="mt-6 text-[15px] leading-relaxed text-plum-light">
               {venue.description}
@@ -101,6 +124,40 @@ export default async function VenueDetailPage({ params }) {
                 </div>
               </>
             )}
+
+            <h3 className="mt-10 text-[11px] font-semibold uppercase tracking-wider text-ink">
+              Reviews {reviews.length > 0 ? `(${reviews.length})` : ''}
+            </h3>
+
+            {reviews.length === 0 && (
+              <p className="mt-3 text-[15px] text-muted">No reviews yet.</p>
+            )}
+
+            {reviews.length > 0 && (
+              <div className="mt-4 space-y-4">
+                {reviews.map((review) => (
+                  <div key={review.id} className="rounded-sm border border-cream-border bg-white p-4">
+                    <div className="flex items-center justify-between">
+                      <StarRating value={review.rating} />
+                      <span className="text-[11px] uppercase tracking-wide text-muted">
+                        {new Date(review.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    {review.comment && <p className="mt-2 text-[14px] text-plum-light">{review.comment}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-5">
+              {user ? (
+                <ReviewForm venueId={venue.id} existingReview={existingReview} />
+              ) : (
+                <p className="text-sm text-plum-light">
+                  <Link href="/login" className="font-medium text-plum hover:underline">Log in</Link> to leave a review.
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Right: Inquiry Form */}
