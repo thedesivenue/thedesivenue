@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { InquiryForm } from '@/components/InquiryForm'
+import { BackLink } from '@/components/ui/BackLink'
 import { supabase } from '@/lib/supabase'
 import { FEATURE_LABELS } from '@/lib/features'
 
@@ -46,6 +47,10 @@ export default async function VenueDetailPage({ params }) {
     <>
       <Header />
       <main className="flex-1 bg-cream">
+
+        <div className="mx-auto max-w-5xl px-6 pt-6">
+          <BackLink href="/venues">Back to venues</BackLink>
+        </div>
 
         {/* Image */}
         <div className="bg-motif flex h-64 items-center justify-center overflow-hidden bg-gradient-to-br from-plum-pale to-gold-pale sm:h-80">
