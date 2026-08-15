@@ -4,9 +4,11 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
-import { supabase } from '@/lib/supabase'
 import { Pill } from '@/components/ui/Pill'
 import { CULTURAL_FEATURES } from '@/lib/features'
+
+const MAX_IMAGES = 6
+const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 const emptyForm = {
   owner_name: '',
@@ -27,6 +29,7 @@ const emptyForm = {
 export default function ListVenuePage() {
   const [form, setForm] = useState(emptyForm)
   const [features, setFeatures] = useState([])
+  const [images, setImages] = useState([])
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
@@ -40,48 +43,55 @@ export default function ListVenuePage() {
     setFeatures((prev) => (prev.includes(key) ? prev.filter((f) => f !== key) : [...prev, key]))
   }
 
+  const handleImageSelect = (e) => {
+    const files = Array.from(e.target.files)
+    e.target.value = ''
+
+    if (images.length + files.length > MAX_IMAGES) {
+      setError(`Please select at most ${MAX_IMAGES} photos.`)
+      return
+    }
+    const oversized = files.find((f) => f.size > MAX_FILE_SIZE)
+    if (oversized) {
+      setError(`${oversized.name} is larger than 5MB.`)
+      return
+    }
+
+    setError('')
+    setImages((prev) => [...prev, ...files.map((file) => ({ file, preview: URL.createObjectURL(file) }))])
+  }
+
+  const removeImage = (index) => {
+    setImages((prev) => {
+      URL.revokeObjectURL(prev[index].preview)
+      return prev.filter((_, i) => i !== index)
+    })
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitting(true)
     setError('')
 
-    const { data: venue, error: venueError } = await supabase
-      .from('venues')
-      .insert([{
-        owner_name: form.owner_name,
-        owner_email: form.owner_email,
-        owner_phone: form.owner_phone,
-        name: form.name,
-        address: form.address,
-        city: form.city,
-        state: form.state,
-        zip: form.zip,
-        description: form.description,
-        min_capacity: form.min_capacity ? parseInt(form.min_capacity) : null,
-        max_capacity: form.max_capacity ? parseInt(form.max_capacity) : null,
-        min_price: form.min_price ? parseFloat(form.min_price) : null,
-        parking: form.parking,
-        is_approved: false,
-      }])
-      .select()
-      .single()
+    const body = new FormData()
+    Object.entries(form).forEach(([key, value]) => body.set(key, value))
+    features.forEach((key) => body.append('features', key))
+    images.forEach(({ file }) => body.append('images', file))
 
-    if (venueError) {
-      console.error('Error submitting venue:', venueError)
+    try {
+      const res = await fetch('/api/venues', { method: 'POST', body })
+      const result = await res.json()
+      if (!res.ok) {
+        setError(result.error || 'Something went wrong submitting your venue. Please try again.')
+        setSubmitting(false)
+        return
+      }
+      setSubmitted(true)
+    } catch (err) {
+      console.error('Error submitting venue:', err)
       setError('Something went wrong submitting your venue. Please try again.')
-      setSubmitting(false)
-      return
     }
-
-    if (features.length > 0) {
-      const featureRow = { venue_id: venue.id }
-      features.forEach((key) => { featureRow[key] = true })
-      const { error: featureError } = await supabase.from('venue_features').insert([featureRow])
-      if (featureError) console.error('Error submitting venue features:', featureError)
-    }
-
     setSubmitting(false)
-    setSubmitted(true)
   }
 
   if (submitted) {
@@ -145,6 +155,37 @@ export default function ListVenuePage() {
                 On-site parking available
               </label>
             </div>
+          </fieldset>
+
+          <fieldset className="mt-6 rounded-sm border border-cream-border bg-white p-6">
+            <legend className="px-1 text-base font-medium text-ink">Photos</legend>
+            <p className="mt-1 text-[13px] text-muted">Up to {MAX_IMAGES} photos, 5MB each.</p>
+
+            {images.length > 0 && (
+              <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
+                {images.map((img, i) => (
+                  <div key={img.preview} className="group relative h-24 overflow-hidden rounded-sm border border-cream-border">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img.preview} alt="" className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-sm bg-ink/70 text-[11px] text-white opacity-0 transition group-hover:opacity-100"
+                      aria-label="Remove photo"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {images.length < MAX_IMAGES && (
+              <label className="mt-4 flex cursor-pointer items-center justify-center rounded-sm border border-dashed border-cream-border py-6 text-[13px] text-muted hover:border-plum-light hover:text-plum-light">
+                <input type="file" accept="image/*" multiple onChange={handleImageSelect} className="hidden" />
+                Click to add photos
+              </label>
+            )}
           </fieldset>
 
           <fieldset className="mt-6 rounded-sm border border-cream-border bg-white p-6">

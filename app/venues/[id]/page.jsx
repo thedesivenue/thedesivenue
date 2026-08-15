@@ -3,6 +3,7 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { InquiryForm } from '@/components/InquiryForm'
 import { BackLink } from '@/components/ui/BackLink'
+import { ImageGallery } from '@/components/ImageGallery'
 import { supabase } from '@/lib/supabase'
 import { FEATURE_LABELS } from '@/lib/features'
 
@@ -52,19 +53,7 @@ export default async function VenueDetailPage({ params }) {
           <BackLink href="/venues">Back to venues</BackLink>
         </div>
 
-        {/* Image */}
-        <div className="bg-motif flex h-64 items-center justify-center overflow-hidden sm:h-80">
-          {venue.venue_images?.[0] ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={venue.venue_images[0].url}
-              alt={venue.name}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="font-display text-4xl text-plum/20">✦</span>
-          )}
-        </div>
+        <ImageGallery images={venue.venue_images} name={venue.name} />
 
         <section className="mx-auto grid max-w-5xl gap-10 px-6 py-12 lg:grid-cols-[1.5fr_1fr]">
 
