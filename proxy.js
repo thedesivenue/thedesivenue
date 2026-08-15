@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
+import { updateSession } from '@/lib/supabase/middleware'
 
-export function proxy(request) {
+export async function proxy(request) {
   const { pathname } = request.nextUrl
 
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
@@ -9,9 +10,11 @@ export function proxy(request) {
     }
   }
 
-  return NextResponse.next()
+  // Refreshes the Supabase Auth session cookie on every request so JWTs
+  // don't silently expire between client-side navigations.
+  return updateSession(request)
 }
 
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }

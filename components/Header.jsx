@@ -1,10 +1,28 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export function Header() {
   const pathname = usePathname()
+  const router = useRouter()
+  const [session, setSession] = useState(undefined)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data }) => setSession(data.session))
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setSession(session))
+    return () => listener.subscription.unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/')
+    router.refresh()
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-cream-border bg-cream/95 backdrop-blur">
@@ -23,13 +41,37 @@ export function Header() {
               Browse Venues
             </Link>
           )}
-          {pathname !== '/list-venue' && (
-            <Link
-              href="/list-venue"
-              className="rounded-sm bg-plum px-5 py-2.5 text-[12px] font-semibold uppercase tracking-wider text-gold-light transition hover:bg-ink"
-            >
-              List Your Venue
-            </Link>
+
+          {session === undefined ? null : session ? (
+            <>
+              {pathname !== '/account' && (
+                <Link href="/account" className="text-[12px] uppercase tracking-wider text-plum-light hover:text-plum">
+                  My Account
+                </Link>
+              )}
+              <button
+                onClick={handleLogout}
+                className="text-[12px] uppercase tracking-wider text-plum-light hover:text-plum"
+              >
+                Log Out
+              </button>
+            </>
+          ) : (
+            <>
+              {pathname !== '/login' && (
+                <Link href="/login" className="text-[12px] uppercase tracking-wider text-plum-light hover:text-plum">
+                  Log In
+                </Link>
+              )}
+              {pathname !== '/list-venue' && (
+                <Link
+                  href="/list-venue"
+                  className="rounded-sm bg-plum px-5 py-2.5 text-[12px] font-semibold uppercase tracking-wider text-gold-light transition hover:bg-ink"
+                >
+                  List Your Venue
+                </Link>
+              )}
+            </>
           )}
         </div>
       </nav>

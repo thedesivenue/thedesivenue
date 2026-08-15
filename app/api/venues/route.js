@@ -1,40 +1,26 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
+import { createClient as createServerSupabase } from '@/lib/supabase/server'
 import { CULTURAL_FEATURES } from '@/lib/features'
+import { validateImages, uploadVenueImages } from '@/lib/venueImages'
 
-const BUCKET = 'venue-images'
-const MAX_IMAGES = 6
-const MAX_FILE_SIZE = 5 * 1024 * 1024
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 const FEATURE_KEYS = new Set(CULTURAL_FEATURES.map((f) => f.key))
-
-async function ensureBucket() {
-  const { data, error } = await supabaseAdmin.storage.getBucket(BUCKET)
-  if (data) return
-  if (error && !/not found/i.test(error.message)) throw error
-  const { error: createError } = await supabaseAdmin.storage.createBucket(BUCKET, { public: true })
-  if (createError && !/already exists/i.test(createError.message)) throw createError
-}
 
 export async function POST(request) {
   const formData = await request.formData()
 
   const images = formData.getAll('images').filter((f) => f instanceof File && f.size > 0)
-  if (images.length > MAX_IMAGES) {
-    return NextResponse.json({ error: `Please upload at most ${MAX_IMAGES} photos.` }, { status: 400 })
-  }
-  for (const file of images) {
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json({ error: `${file.name} isn't a supported image type.` }, { status: 400 })
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: `${file.name} is larger than 5MB.` }, { status: 400 })
-    }
-  }
+  const imageError = validateImages(images)
+  if (imageError) return NextResponse.json({ error: imageError }, { status: 400 })
+
+  // Logged-in venue owners skip re-entering their own contact info and the
+  // venue gets linked to their account.
+  const supabase = await createServerSupabase()
+  const { data: { user } } = await supabase.auth.getUser()
 
   const venuePayload = {
     owner_name: formData.get('owner_name'),
-    owner_email: formData.get('owner_email'),
+    owner_email: formData.get('owner_email') || user?.email || null,
     owner_phone: formData.get('owner_phone'),
     name: formData.get('name'),
     address: formData.get('address'),
@@ -47,9 +33,10 @@ export async function POST(request) {
     min_price: formData.get('min_price') ? parseFloat(formData.get('min_price')) : null,
     parking: formData.get('parking') === 'true',
     is_approved: false,
+    owner_id: user?.id || null,
   }
 
-  if (!venuePayload.owner_name || !venuePayload.owner_email || !venuePayload.owner_phone || !venuePayload.name) {
+  if (!venuePayload.name || !venuePayload.owner_name || !venuePayload.owner_email || !venuePayload.owner_phone) {
     return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 })
   }
 
@@ -72,34 +59,11 @@ export async function POST(request) {
     if (featureError) console.error('Error inserting venue features:', featureError)
   }
 
-  if (images.length > 0) {
-    try {
-      await ensureBucket()
-    } catch (bucketError) {
-      console.error('Error ensuring storage bucket:', bucketError)
-      return NextResponse.json({ id: venue.id, warning: 'Venue submitted, but photos could not be uploaded.' })
-    }
-
-    const imageRows = []
-    for (const file of images) {
-      const ext = file.name.split('.').pop()
-      const path = `${venue.id}/${crypto.randomUUID()}.${ext}`
-      const { error: uploadError } = await supabaseAdmin.storage
-        .from(BUCKET)
-        .upload(path, file, { contentType: file.type })
-
-      if (uploadError) {
-        console.error('Error uploading image:', uploadError)
-        continue
-      }
-      const { data: publicUrl } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(path)
-      imageRows.push({ venue_id: venue.id, url: publicUrl.publicUrl })
-    }
-
-    if (imageRows.length > 0) {
-      const { error: imagesError } = await supabaseAdmin.from('venue_images').insert(imageRows)
-      if (imagesError) console.error('Error inserting venue images:', imagesError)
-    }
+  try {
+    await uploadVenueImages(venue.id, images)
+  } catch (bucketError) {
+    console.error('Error uploading venue images:', bucketError)
+    return NextResponse.json({ id: venue.id, warning: 'Venue submitted, but photos could not be uploaded.' })
   }
 
   return NextResponse.json({ id: venue.id })

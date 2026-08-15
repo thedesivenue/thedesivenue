@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 const inputClass =
   'rounded-sm border border-cream-border bg-cream px-3.5 py-2.5 text-sm text-ink outline-none placeholder:text-muted focus:border-plum'
@@ -9,9 +9,20 @@ const inputClass =
 export function InquiryForm({ venueId, venueName }) {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [userId, setUserId] = useState(null)
   const [form, setForm] = useState({
     name: '', email: '', phone: '', event_date: '', guest_count: '', message: ''
   })
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setUserId(data.user.id)
+        setForm((prev) => ({ ...prev, email: prev.email || data.user.email || '' }))
+      }
+    })
+  }, [])
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -20,10 +31,12 @@ export function InquiryForm({ venueId, venueName }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitting(true)
+    const supabase = createClient()
     const { error } = await supabase
       .from('inquiries')
       .insert([{
         venue_id: venueId,
+        user_id: userId,
         name: form.name,
         email: form.email,
         phone: form.phone,

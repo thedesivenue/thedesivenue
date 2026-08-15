@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Pill } from '@/components/ui/Pill'
+import { createClient } from '@/lib/supabase/client'
 import { CULTURAL_FEATURES } from '@/lib/features'
 import { MAX_IMAGES, MAX_FILE_SIZE } from '@/lib/venueImages'
 
@@ -24,13 +25,20 @@ const emptyForm = {
   parking: false,
 }
 
-export default function ListVenuePage() {
+export default function NewOwnerVenuePage() {
+  const router = useRouter()
   const [form, setForm] = useState(emptyForm)
   const [features, setFeatures] = useState([])
   const [images, setImages] = useState([])
   const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.email) setForm((prev) => ({ ...prev, owner_email: data.user.email }))
+    })
+  }, [])
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target
@@ -84,30 +92,12 @@ export default function ListVenuePage() {
         setSubmitting(false)
         return
       }
-      setSubmitted(true)
+      router.push(`/account/venues/${result.id}`)
     } catch (err) {
       console.error('Error submitting venue:', err)
       setError('Something went wrong submitting your venue. Please try again.')
+      setSubmitting(false)
     }
-    setSubmitting(false)
-  }
-
-  if (submitted) {
-    return (
-      <>
-        <Header />
-        <main className="flex-1 bg-cream px-6 py-24 text-center">
-          <p className="font-display text-2xl font-bold text-plum">Thank you ✦</p>
-          <p className="mx-auto mt-3 max-w-md text-[15px] text-plum-light">
-            Your venue has been submitted for review. We&apos;ll reach out once it&apos;s approved and live on The Desi Venue.
-          </p>
-          <Link href="/venues" className="mt-8 inline-block rounded-sm bg-plum px-7 py-3.5 text-[12px] font-semibold uppercase tracking-wider text-gold-light hover:bg-ink">
-            Browse venues
-          </Link>
-        </main>
-        <Footer />
-      </>
-    )
   }
 
   return (
@@ -115,16 +105,16 @@ export default function ListVenuePage() {
       <Header />
       <main className="flex-1 bg-cream">
         <section className="border-b border-cream-border bg-white px-6 py-14 text-center">
-          <h1 className="font-display text-4xl font-bold text-ink sm:text-5xl">List your venue free</h1>
+          <h1 className="font-display text-4xl font-bold text-ink sm:text-5xl">Add a venue</h1>
           <p className="mx-auto mt-3 max-w-lg text-[15px] text-plum-light">
-            Reach thousands of Indian families planning events in New Jersey. No listing fees, no commission.
+            It&apos;ll be linked to your account and reviewed before going live.
           </p>
         </section>
 
         <form onSubmit={handleSubmit} className="mx-auto max-w-2xl px-6 py-12">
 
           <fieldset className="rounded-sm border border-cream-border bg-white p-6">
-            <legend className="px-1 text-base font-medium text-ink">Your contact info</legend>
+            <legend className="px-1 text-base font-medium text-ink">Contact info</legend>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <input name="owner_name" placeholder="Your name" required value={form.owner_name} onChange={handleChange} className={inputClass} />
               <input name="owner_phone" placeholder="Phone" required value={form.owner_phone} onChange={handleChange} className={inputClass} />
