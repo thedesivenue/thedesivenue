@@ -7,8 +7,10 @@ import { BackLink } from '@/components/ui/BackLink'
 import { ImageGallery } from '@/components/ImageGallery'
 import { StarRating } from '@/components/ui/StarRating'
 import { ReviewForm } from '@/components/ReviewForm'
+import { FavoriteButton } from '@/components/FavoriteButton'
 import { supabase } from '@/lib/supabase'
 import { createClient as createServerSupabase } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { FEATURE_LABELS } from '@/lib/features'
 
 export const dynamic = 'force-dynamic'
@@ -58,6 +60,17 @@ export default async function VenueDetailPage({ params }) {
   const { data: { user } } = await serverSupabase.auth.getUser()
   const existingReview = user ? reviews.find((r) => r.user_id === user.id) : null
 
+  let isFavorited = false
+  if (user) {
+    const { data: favorite } = await supabaseAdmin
+      .from('favorites')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('venue_id', venue.id)
+      .maybeSingle()
+    isFavorited = !!favorite
+  }
+
   return (
     <>
       <Header />
@@ -73,7 +86,16 @@ export default async function VenueDetailPage({ params }) {
 
           {/* Left: Details */}
           <div>
-            <h1 className="font-display text-4xl font-bold text-ink">{venue.name}</h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="font-display text-4xl font-bold text-ink">{venue.name}</h1>
+              {user && (
+                <FavoriteButton
+                  venueId={venue.id}
+                  initialFavorited={isFavorited}
+                  className="mt-1 flex-none border border-cream-border hover:border-plum-light"
+                />
+              )}
+            </div>
             <p className="mt-1.5 text-[15px] text-muted">
               {venue.address}, {venue.city}, {venue.state} {venue.zip}
             </p>

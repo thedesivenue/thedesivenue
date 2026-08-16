@@ -17,7 +17,8 @@ const sortOptions = [
 const selectClass =
   'rounded-sm border border-cream-border bg-white px-3.5 py-2.5 text-sm text-ink outline-none focus:border-plum'
 
-export function VenuesBrowser({ venues }) {
+export function VenuesBrowser({ venues, showFavorite = false, favoritedIds = [] }) {
+  const favoritedSet = new Set(favoritedIds)
   const [activeFilters, setActiveFilters] = useState([])
   const [search, setSearch] = useState('')
   const [city, setCity] = useState('')
@@ -152,7 +153,14 @@ export function VenuesBrowser({ venues }) {
             No venues found. Try removing some filters.
           </p>
         ) : (
-          filtered.map((venue) => <VenueCard key={venue.id} venue={venue} />)
+          filtered.map((venue) => (
+            <VenueCard
+              key={venue.id}
+              venue={venue}
+              showFavorite={showFavorite}
+              isFavorited={favoritedSet.has(venue.id)}
+            />
+          ))
         )}
       </section>
     </>

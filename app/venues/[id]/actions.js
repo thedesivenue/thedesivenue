@@ -29,3 +29,27 @@ export async function submitReview(prevState, formData) {
   revalidatePath(`/venues/${venueId}`)
   return { success: true }
 }
+
+export async function toggleFavorite(venueId) {
+  const supabase = await createServerSupabase()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Please log in to save venues.' }
+
+  const { data: existing } = await supabaseAdmin
+    .from('favorites')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('venue_id', venueId)
+    .maybeSingle()
+
+  if (existing) {
+    await supabaseAdmin.from('favorites').delete().eq('id', existing.id)
+  } else {
+    await supabaseAdmin.from('favorites').insert([{ user_id: user.id, venue_id: venueId }])
+  }
+
+  revalidatePath('/venues')
+  revalidatePath(`/venues/${venueId}`)
+  revalidatePath('/account')
+  return { favorited: !existing }
+}

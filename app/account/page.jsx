@@ -5,6 +5,7 @@ import { Footer } from '@/components/Footer'
 import { createClient as createServerSupabase } from '@/lib/supabase/server'
 import { getOrCreateProfile } from '@/lib/profile'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
+import { VenueCard } from '@/components/VenueCard'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +23,10 @@ export default async function AccountPage() {
         {profile.role === 'venue_owner' ? (
           <OwnerDashboard userId={user.id} />
         ) : (
-          <UserInquiries userId={user.id} />
+          <>
+            <SavedVenues userId={user.id} />
+            <UserInquiries userId={user.id} />
+          </>
         )}
       </main>
       <Footer />
@@ -72,6 +76,32 @@ async function OwnerDashboard({ userId }) {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+async function SavedVenues({ userId }) {
+  const { data: favorites } = await supabaseAdmin.from('favorites').select('venue_id').eq('user_id', userId)
+  const venueIds = (favorites || []).map((f) => f.venue_id)
+
+  if (venueIds.length === 0) return null
+
+  const { data: venues, error } = await supabaseAdmin
+    .from('venues')
+    .select('*, venue_features(*), venue_images(*), reviews(rating)')
+    .in('id', venueIds)
+
+  if (error) console.error('Error fetching saved venues:', error)
+  if (!venues || venues.length === 0) return null
+
+  return (
+    <div className="mx-auto max-w-4xl px-6 pt-14">
+      <h1 className="font-display text-3xl font-bold text-ink">Saved venues</h1>
+      <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+        {venues.map((venue) => (
+          <VenueCard key={venue.id} venue={venue} showFavorite isFavorited />
+        ))}
+      </div>
     </div>
   )
 }
