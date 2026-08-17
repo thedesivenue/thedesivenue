@@ -32,10 +32,15 @@ export function InquiryForm({ venueId, venueName }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitting(true)
+    // Generated client-side (rather than read back via .select()) since the
+    // RLS insert policy on inquiries doesn't grant SELECT, and .insert().select()
+    // requires both — chaining .select() there fails the whole insert.
+    const inquiryId = crypto.randomUUID()
     const supabase = createClient()
     const { error } = await supabase
       .from('inquiries')
       .insert([{
+        id: inquiryId,
         venue_id: venueId,
         user_id: userId,
         name: form.name,
@@ -52,6 +57,11 @@ export function InquiryForm({ venueId, venueName }) {
       alert('Something went wrong. Please try again.')
     } else {
       setSubmitted(true)
+      fetch('/api/notify-inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inquiryId }),
+      }).catch((err) => console.error('Error triggering inquiry notification:', err))
     }
   }
 

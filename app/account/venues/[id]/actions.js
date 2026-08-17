@@ -6,6 +6,7 @@ import { createClient as createServerSupabase } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { CULTURAL_FEATURES } from '@/lib/features'
 import { validateImages, uploadVenueImages, deleteVenueImage } from '@/lib/venueImages'
+import { notifyNewReply } from '@/lib/notify'
 
 const FEATURE_KEYS = new Set(CULTURAL_FEATURES.map((f) => f.key))
 
@@ -86,7 +87,7 @@ export async function sendOwnerReply(prevState, formData) {
 
   const { data: inquiry } = await supabaseAdmin
     .from('inquiries')
-    .select('venue_id, venues(owner_id)')
+    .select('venue_id, email, venues(owner_id, name)')
     .eq('id', inquiryId)
     .single()
 
@@ -94,6 +95,13 @@ export async function sendOwnerReply(prevState, formData) {
 
   const { error } = await supabaseAdmin.from('inquiry_messages').insert([{ inquiry_id: inquiryId, sender_id: user.id, body }])
   if (error) return { error: 'Something went wrong sending your reply.' }
+
+  await notifyNewReply({
+    toEmail: inquiry.email,
+    venueName: inquiry.venues.name,
+    replyBody: body,
+    accountUrl: '/account',
+  })
 
   revalidatePath(`/account/venues/${inquiry.venue_id}`)
   return { success: true }

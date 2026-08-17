@@ -8,9 +8,11 @@ import { ImageGallery } from '@/components/ImageGallery'
 import { StarRating } from '@/components/ui/StarRating'
 import { ReviewForm } from '@/components/ReviewForm'
 import { FavoriteButton } from '@/components/FavoriteButton'
+import { ClaimForm } from '@/components/ClaimForm'
 import { supabase } from '@/lib/supabase'
 import { createClient as createServerSupabase } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
+import { getOrCreateProfile } from '@/lib/profile'
 import { FEATURE_LABELS } from '@/lib/features'
 
 export const dynamic = 'force-dynamic'
@@ -47,6 +49,8 @@ export default async function VenueDetailPage({ params }) {
 
   if (!venue) notFound()
 
+  await supabaseAdmin.rpc('increment_venue_views', { venue_id_input: venue.id })
+
   const activeFeatures = venue.venue_features?.[0]
     ? Object.entries(venue.venue_features[0])
         .filter(([key, val]) => val === true && FEATURE_LABELS[key])
@@ -69,6 +73,22 @@ export default async function VenueDetailPage({ params }) {
       .eq('venue_id', venue.id)
       .maybeSingle()
     isFavorited = !!favorite
+  }
+
+  let showClaimForm = false
+  let alreadyClaimed = false
+  if (user && !venue.owner_id) {
+    const profile = await getOrCreateProfile(user)
+    if (profile.role === 'venue_owner') {
+      showClaimForm = true
+      const { data: claim } = await supabaseAdmin
+        .from('venue_claims')
+        .select('status')
+        .eq('venue_id', venue.id)
+        .eq('user_id', user.id)
+        .maybeSingle()
+      alreadyClaimed = !!claim && claim.status !== 'rejected'
+    }
   }
 
   return (
@@ -183,8 +203,15 @@ export default async function VenueDetailPage({ params }) {
           </div>
 
           {/* Right: Inquiry Form */}
-          <div className="h-fit rounded-sm border border-cream-border bg-white p-6 lg:sticky lg:top-24">
-            <InquiryForm venueId={venue.id} venueName={venue.name} />
+          <div className="h-fit space-y-5 lg:sticky lg:top-24">
+            <div className="rounded-sm border border-cream-border bg-white p-6">
+              <InquiryForm venueId={venue.id} venueName={venue.name} />
+            </div>
+            {showClaimForm && (
+              <div className="bg-white">
+                <ClaimForm venueId={venue.id} alreadyClaimed={alreadyClaimed} />
+              </div>
+            )}
           </div>
 
         </section>

@@ -70,7 +70,7 @@ async function OwnerDashboard({ userId }) {
             >
               <div>
                 <p className="font-display text-lg font-bold text-ink">{venue.name}</p>
-                <p className="mt-1 text-[13px] text-muted">{venue.city}, {venue.state}</p>
+                <p className="mt-1 text-[13px] text-muted">{venue.city}, {venue.state} · {venue.view_count || 0} views</p>
               </div>
               <span className={venue.is_approved ? approvedPill : pendingPill}>
                 {venue.is_approved ? 'Live' : 'Pending review'}

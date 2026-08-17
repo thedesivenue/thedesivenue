@@ -58,6 +58,7 @@ export default async function OwnerVenueDetailPage({ params }) {
           <p className="mt-1.5 text-[15px] text-muted">
             {venue.address}, {venue.city}, {venue.state} {venue.zip}
           </p>
+          <p className="mt-2 text-[13px] text-muted">{venue.view_count || 0} views</p>
 
           <h2 className="mt-10 text-[11px] font-semibold uppercase tracking-wider text-ink">
             Inquiries {inquiries?.length ? `(${inquiries.length})` : ''}

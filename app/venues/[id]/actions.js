@@ -53,3 +53,28 @@ export async function toggleFavorite(venueId) {
   revalidatePath('/account')
   return { favorited: !existing }
 }
+
+export async function submitClaim(prevState, formData) {
+  const supabase = await createServerSupabase()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Please log in as a venue owner to claim this listing.' }
+
+  const venueId = formData.get('venue_id')
+  const message = formData.get('message')?.toString().trim() || null
+
+  const { data: venue } = await supabaseAdmin.from('venues').select('owner_id').eq('id', venueId).single()
+  if (!venue) return { error: 'Venue not found.' }
+  if (venue.owner_id) return { error: 'This listing has already been claimed.' }
+
+  const { error } = await supabaseAdmin
+    .from('venue_claims')
+    .upsert([{ venue_id: venueId, user_id: user.id, message, status: 'pending' }], { onConflict: 'venue_id,user_id' })
+
+  if (error) {
+    console.error('Error submitting claim:', error)
+    return { error: 'Something went wrong submitting your claim.' }
+  }
+
+  revalidatePath(`/venues/${venueId}`)
+  return { success: true }
+}
