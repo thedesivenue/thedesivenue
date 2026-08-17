@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { bodoniModa, inter } from "@/lib/fonts";
+import { AuthHashHandler } from "@/components/AuthHashHandler";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -41,7 +42,10 @@ export default function RootLayout({
       lang="en"
       className={`${bodoniModa.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <AuthHashHandler />
+        {children}
+      </body>
     </html>
   );
 }

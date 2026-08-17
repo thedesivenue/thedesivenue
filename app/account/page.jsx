@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { createClient as createServerSupabase } from '@/lib/supabase/server'
-import { getOrCreateProfile } from '@/lib/profile'
+import { getOrCreateProfile, claimAnonymousInquiries } from '@/lib/profile'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { VenueCard } from '@/components/VenueCard'
 import { InquiryThread } from '@/components/InquiryThread'
@@ -17,6 +17,7 @@ export default async function AccountPage() {
   if (!user) redirect('/login')
 
   const profile = await getOrCreateProfile(user)
+  await claimAnonymousInquiries(user)
 
   return (
     <>

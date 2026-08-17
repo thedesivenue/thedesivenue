@@ -64,7 +64,7 @@ export function InquiryForm({ venueId, venueName }) {
         </p>
         {!userId && (
           <p className="mt-3 text-[13px] text-muted">
-            <Link href="/signup" className="font-medium text-plum hover:underline">Create an account</Link> next time to view replies and track your inquiries.
+            Want to see the reply? <Link href="/login" className="font-medium text-plum hover:underline">We&apos;ll email you a link</Link> to check on it, no password needed.
           </p>
         )}
       </div>
