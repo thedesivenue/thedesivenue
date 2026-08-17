@@ -37,7 +37,7 @@ export async function generateMetadata({ params }) {
   if (!venue) return { title: 'Venue not found' }
   return {
     title: venue.name,
-    description: venue.description || `${venue.name} in ${venue.city}, NJ — an Indian-event-ready venue on The Desi Venue.`,
+    description: venue.description || `${venue.name} in ${venue.city}, NJ. An Indian-event-ready venue on The Desi Venue.`,
   }
 }
 

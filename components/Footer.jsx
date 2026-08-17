@@ -6,10 +6,11 @@ export function Footer() {
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 sm:grid-cols-3">
         <div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="The Desi Venue" className="h-14 w-auto" />
+          <img src="/logo.svg" alt="The Desi Venue" className="h-20 w-auto" />
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-plum-light">
-            New Jersey&apos;s directory of Indian-event-ready venues — mandap space,
-            fire ceremonies, vegetarian kitchens and more, all searchable in one place.
+            New Jersey&apos;s platform for finding the perfect venue for your Indian
+            event. Mandap space, fire ceremonies, vegetarian kitchens and more,
+            all searchable in one place.
           </p>
         </div>
         <div>

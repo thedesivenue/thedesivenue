@@ -15,11 +15,11 @@ const culturalFilters = [
 const steps = [
   {
     title: 'Search & filter',
-    desc: 'Browse NJ venues and filter by the cultural essentials — mandap space, fire ceremony clearance, vegetarian kitchens, baraat access.',
+    desc: 'Browse NJ venues and filter by the cultural essentials. Mandap space, fire ceremony clearance, vegetarian kitchens, baraat access.',
   },
   {
     title: 'Compare openly',
-    desc: 'See real capacity and starting pricing up front, side by side — no calls required just to get a ballpark.',
+    desc: 'See real capacity and starting pricing up front, side by side. No calls required just to get a ballpark.',
   },
   {
     title: 'Inquire directly',
@@ -29,15 +29,15 @@ const steps = [
 
 const features = [
   { title: 'Cultural filters', desc: 'Filter by mandap, fire ceremony, vegetarian kitchen and more' },
-  { title: 'Transparent pricing', desc: 'See real pricing upfront — no surprises or hidden fees' },
-  { title: 'Direct inquiries', desc: 'Contact venues directly — no middleman, no delays' },
+  { title: 'Transparent pricing', desc: 'See real pricing upfront, no surprises or hidden fees' },
+  { title: 'Direct inquiries', desc: 'Contact venues directly, no middleman, no delays' },
 ]
 
 export default function Home() {
   return (
     <>
       <div className="bg-plum px-6 py-2.5 text-center text-[11px] font-semibold uppercase tracking-wider text-gold-light">
-        ✦ Coming soon — we&apos;re putting the finishing touches on The Desi Venue
+        ✦ Coming soon. We&apos;re putting the finishing touches on The Desi Venue
       </div>
       <Header />
       <main className="flex-1 bg-cream">
@@ -52,7 +52,7 @@ export default function Home() {
               Find the perfect venue for your Indian event
             </h1>
             <p className="mx-auto mt-6 max-w-lg text-lg text-plum-light">
-              Mandap-ready halls, cultural filters, transparent pricing — all in one place.
+              Mandap-ready halls, cultural filters, transparent pricing, all in one place.
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
               <Link
