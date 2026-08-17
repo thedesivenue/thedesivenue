@@ -27,8 +27,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-cream-border bg-cream/95 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <Link href="/" className="font-display text-xl font-bold tracking-tight text-plum">
-          The Desi Venue <span aria-hidden className="text-gold">✦</span>
+        <Link href="/" className="flex items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="The Desi Venue" className="h-16 w-auto" />
         </Link>
         <div className="flex items-center gap-6 sm:gap-8">
           {pathname !== '/' && (

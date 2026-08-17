@@ -1,0 +1,41 @@
+<svg viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C89B4A"/>
+      <stop offset="100%" stop-color="#9B7530"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mark: a single fine-line jharokha/arch with a minimal lotus-petal top, in place of a location pin -->
+  <g transform="translate(96,110)" fill="none" stroke="url(#gold)" stroke-width="1.6">
+    <!-- slender pointed arch -->
+    <path d="M -34 46 L -34 4 C -34 -30 -19 -52 0 -52 C 19 -52 34 -30 34 4 L 34 46" />
+
+    <!-- inner line, slightly inset, for a framed look -->
+    <path d="M -24 46 L -24 6 C -24 -20 -13 -40 0 -40 C 13 -40 24 -20 24 6 L 24 46" stroke-width="1"/>
+
+    <!-- three fine finial lines at the peak, evoking a temple/mandap silhouette without literal ornament -->
+    <line x1="0" y1="-52" x2="0" y2="-66" />
+    <circle cx="0" cy="-70" r="2.6" fill="url(#gold)" stroke="none"/>
+
+    <line x1="-17" y1="-46" x2="-17" y2="-56" stroke-width="1.1"/>
+    <circle cx="-17" cy="-59" r="1.8" fill="url(#gold)" stroke="none"/>
+
+    <line x1="17" y1="-46" x2="17" y2="-56" stroke-width="1.1"/>
+    <circle cx="17" cy="-59" r="1.8" fill="url(#gold)" stroke="none"/>
+
+    <!-- base line -->
+    <line x1="-34" y1="46" x2="34" y2="46" stroke-width="1.6"/>
+  </g>
+
+  <!-- Wordmark: refined serif, generous tracking, single accent -->
+  <g transform="translate(178,98)" font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif">
+    <text x="0" y="0" font-size="42" fill="#231A15" font-weight="500" letter-spacing="3">DESI</text>
+    <text x="103" y="0" font-size="42" fill="#9B7530" font-weight="500" letter-spacing="3">VENUE</text>
+
+    <!-- thin rule -->
+    <line x1="2" y1="22" x2="360" y2="22" stroke="#C89B4A" stroke-width="0.75"/>
+
+    <text x="2" y="44" font-size="12.5" fill="#7A6A5C" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" letter-spacing="4">CURATED VENUES FOR INDIAN CELEBRATIONS</text>
+  </g>
+</svg>
