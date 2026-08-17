@@ -6,6 +6,8 @@ import { createClient as createServerSupabase } from '@/lib/supabase/server'
 import { getOrCreateProfile } from '@/lib/profile'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { VenueCard } from '@/components/VenueCard'
+import { InquiryThread } from '@/components/InquiryThread'
+import { sendPlannerReply } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -109,11 +111,16 @@ async function SavedVenues({ userId }) {
 async function UserInquiries({ userId }) {
   const { data: inquiries, error } = await supabaseAdmin
     .from('inquiries')
-    .select('*, venues(id, name, city)')
+    .select('*, venues(id, name, city, owner_id)')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
   if (error) console.error('Error fetching user inquiries:', error)
+
+  const inquiryIds = (inquiries || []).map((i) => i.id)
+  const { data: replies } = inquiryIds.length
+    ? await supabaseAdmin.from('inquiry_messages').select('*').in('inquiry_id', inquiryIds).order('created_at', { ascending: true })
+    : { data: [] }
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-14">
@@ -125,23 +132,37 @@ async function UserInquiries({ userId }) {
         </p>
       ) : (
         <div className="mt-8 space-y-4">
-          {inquiries.map((inquiry) => (
-            <div key={inquiry.id} className="rounded-sm border border-cream-border bg-white p-5">
-              <div className="flex items-center justify-between">
-                {inquiry.venues ? (
-                  <Link href={`/venues/${inquiry.venues.id}`} className="font-display text-lg font-bold text-plum hover:underline">
-                    {inquiry.venues.name}
-                  </Link>
-                ) : (
-                  <p className="font-display text-lg font-bold text-ink">Venue no longer listed</p>
+          {inquiries.map((inquiry) => {
+            const thread = inquiry.venues ? [
+              ...(inquiry.message
+                ? [{ id: `initial-${inquiry.id}`, body: inquiry.message, created_at: inquiry.created_at, fromOwner: false }]
+                : []),
+              ...(replies || [])
+                .filter((m) => m.inquiry_id === inquiry.id)
+                .map((m) => ({ ...m, fromOwner: m.sender_id === inquiry.venues.owner_id })),
+            ] : []
+
+            return (
+              <div key={inquiry.id} className="rounded-sm border border-cream-border bg-white p-5">
+                <div className="flex items-center justify-between">
+                  {inquiry.venues ? (
+                    <Link href={`/venues/${inquiry.venues.id}`} className="font-display text-lg font-bold text-plum hover:underline">
+                      {inquiry.venues.name}
+                    </Link>
+                  ) : (
+                    <p className="font-display text-lg font-bold text-ink">Venue no longer listed</p>
+                  )}
+                  <span className="text-[11px] uppercase tracking-wide text-muted">
+                    {new Date(inquiry.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+
+                {inquiry.venues && (
+                  <InquiryThread inquiryId={inquiry.id} messages={thread} replyAction={sendPlannerReply} />
                 )}
-                <span className="text-[11px] uppercase tracking-wide text-muted">
-                  {new Date(inquiry.created_at).toLocaleDateString()}
-                </span>
               </div>
-              {inquiry.message && <p className="mt-2 text-[14px] text-plum-light">{inquiry.message}</p>}
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

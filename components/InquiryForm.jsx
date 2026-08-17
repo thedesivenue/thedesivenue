@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -59,8 +60,13 @@ export function InquiryForm({ venueId, venueName }) {
       <div className="py-6 text-center">
         <p className="font-display text-lg font-bold text-plum">Inquiry sent ✦</p>
         <p className="mt-2 text-sm text-plum-light">
-          {venueName} will reach out to you directly.
+          {venueName} will reply here or reach out to you directly.
         </p>
+        {!userId && (
+          <p className="mt-3 text-[13px] text-muted">
+            <Link href="/signup" className="font-medium text-plum hover:underline">Create an account</Link> next time to view replies and track your inquiries.
+          </p>
+        )}
       </div>
     )
   }

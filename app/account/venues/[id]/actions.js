@@ -74,3 +74,27 @@ export async function removeVenueImage(venueId, imageId) {
   if (image) await deleteVenueImage(image)
   revalidatePath(`/account/venues/${venueId}/edit`)
 }
+
+export async function sendOwnerReply(prevState, formData) {
+  const inquiryId = formData.get('inquiry_id')
+  const body = formData.get('body')?.toString().trim()
+  if (!body) return { error: 'Message cannot be empty.' }
+
+  const supabase = await createServerSupabase()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: inquiry } = await supabaseAdmin
+    .from('inquiries')
+    .select('venue_id, venues(owner_id)')
+    .eq('id', inquiryId)
+    .single()
+
+  if (!inquiry || inquiry.venues?.owner_id !== user.id) redirect('/account')
+
+  const { error } = await supabaseAdmin.from('inquiry_messages').insert([{ inquiry_id: inquiryId, sender_id: user.id, body }])
+  if (error) return { error: 'Something went wrong sending your reply.' }
+
+  revalidatePath(`/account/venues/${inquiry.venue_id}`)
+  return { success: true }
+}

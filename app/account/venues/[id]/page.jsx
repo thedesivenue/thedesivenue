@@ -4,6 +4,8 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { createClient as createServerSupabase } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
+import { InquiryThread } from '@/components/InquiryThread'
+import { sendOwnerReply } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,6 +24,11 @@ export default async function OwnerVenueDetailPage({ params }) {
     .select('*')
     .eq('venue_id', id)
     .order('created_at', { ascending: false })
+
+  const inquiryIds = (inquiries || []).map((i) => i.id)
+  const { data: replies } = inquiryIds.length
+    ? await supabaseAdmin.from('inquiry_messages').select('*').in('inquiry_id', inquiryIds).order('created_at', { ascending: true })
+    : { data: [] }
 
   return (
     <>
@@ -60,24 +67,36 @@ export default async function OwnerVenueDetailPage({ params }) {
             <p className="mt-4 text-[15px] text-muted">No inquiries yet.</p>
           ) : (
             <div className="mt-4 space-y-4">
-              {inquiries.map((inquiry) => (
-                <div key={inquiry.id} className="rounded-sm border border-cream-border bg-white p-5">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-medium text-ink">{inquiry.name}</p>
-                    <span className="text-[11px] uppercase tracking-wide text-muted">
-                      {new Date(inquiry.created_at).toLocaleDateString()}
-                    </span>
+              {inquiries.map((inquiry) => {
+                const thread = [
+                  ...(inquiry.message
+                    ? [{ id: `initial-${inquiry.id}`, body: inquiry.message, created_at: inquiry.created_at, fromOwner: false }]
+                    : []),
+                  ...(replies || [])
+                    .filter((m) => m.inquiry_id === inquiry.id)
+                    .map((m) => ({ ...m, fromOwner: m.sender_id === user.id })),
+                ]
+
+                return (
+                  <div key={inquiry.id} className="rounded-sm border border-cream-border bg-white p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="font-medium text-ink">{inquiry.name}</p>
+                      <span className="text-[11px] uppercase tracking-wide text-muted">
+                        {new Date(inquiry.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[13px] text-muted">{inquiry.email} · {inquiry.phone}</p>
+                    {inquiry.event_date && (
+                      <p className="mt-1 text-[13px] text-muted">Event date: {inquiry.event_date}</p>
+                    )}
+                    {inquiry.guest_count && (
+                      <p className="mt-1 text-[13px] text-muted">Guests: {inquiry.guest_count}</p>
+                    )}
+
+                    <InquiryThread inquiryId={inquiry.id} messages={thread} replyAction={sendOwnerReply} />
                   </div>
-                  <p className="mt-1 text-[13px] text-muted">{inquiry.email} · {inquiry.phone}</p>
-                  {inquiry.event_date && (
-                    <p className="mt-1 text-[13px] text-muted">Event date: {inquiry.event_date}</p>
-                  )}
-                  {inquiry.guest_count && (
-                    <p className="mt-1 text-[13px] text-muted">Guests: {inquiry.guest_count}</p>
-                  )}
-                  {inquiry.message && <p className="mt-3 text-[14px] text-plum-light">{inquiry.message}</p>}
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
