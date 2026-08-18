@@ -19,12 +19,13 @@ export function AuthHashHandler() {
     const params = new URLSearchParams(hash.slice(1))
     const access_token = params.get('access_token')
     const refresh_token = params.get('refresh_token')
+    const type = params.get('type')
     if (!access_token || !refresh_token) return
 
     const supabase = createClient()
     supabase.auth.setSession({ access_token, refresh_token }).then(({ error }) => {
       window.history.replaceState(null, '', window.location.pathname + window.location.search)
-      if (!error) window.location.href = '/account'
+      if (!error) window.location.href = type === 'recovery' ? '/reset-password' : '/account'
     })
   }, [])
 

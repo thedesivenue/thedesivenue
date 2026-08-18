@@ -92,6 +92,12 @@ export default function LoginPage() {
             </div>
           </fieldset>
 
+          {mode === 'password' && (
+            <p className="mt-3 text-right text-sm">
+              <Link href="/forgot-password" className="text-plum-light hover:text-plum">Forgot password?</Link>
+            </p>
+          )}
+
           {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
           <button
