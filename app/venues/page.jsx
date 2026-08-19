@@ -1,6 +1,7 @@
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { VenuesBrowser } from '@/components/VenuesBrowser'
+import { BackLink } from '@/components/ui/BackLink'
 import { supabase } from '@/lib/supabase'
 import { createClient as createServerSupabase } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
@@ -38,6 +39,9 @@ export default async function VenuesPage() {
     <>
       <Header />
       <main className="flex-1 bg-cream">
+        <div className="px-6 pt-6">
+          <BackLink href="/">Back to home</BackLink>
+        </div>
         <VenuesBrowser venues={data || []} showFavorite={!!user} favoritedIds={favoritedIds} />
       </main>
       <Footer />

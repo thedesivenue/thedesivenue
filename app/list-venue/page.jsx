@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Pill } from '@/components/ui/Pill'
+import { BackLink } from '@/components/ui/BackLink'
 import { CULTURAL_FEATURES } from '@/lib/features'
 import { MAX_IMAGES, MAX_FILE_SIZE } from '@/lib/venueImages'
 
@@ -97,6 +98,9 @@ export default function ListVenuePage() {
       <>
         <Header />
         <main className="flex-1 bg-cream px-6 py-24 text-center">
+          <div className="mx-auto mb-6 max-w-md text-left">
+            <BackLink href="/">Back to home</BackLink>
+          </div>
           <p className="font-display text-2xl font-bold text-plum">Thank you ✦</p>
           <p className="mx-auto mt-3 max-w-md text-[15px] text-plum-light">
             Your venue has been submitted for review. We&apos;ll reach out once it&apos;s approved and live on The Desi Venue.
@@ -114,6 +118,9 @@ export default function ListVenuePage() {
     <>
       <Header />
       <main className="flex-1 bg-cream">
+        <div className="px-6 pt-6">
+          <BackLink href="/">Back to home</BackLink>
+        </div>
         <section className="border-b border-cream-border bg-white px-6 py-14 text-center">
           <h1 className="font-display text-4xl font-bold text-ink sm:text-5xl">List your venue free</h1>
           <p className="mx-auto mt-3 max-w-lg text-[15px] text-plum-light">
