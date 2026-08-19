@@ -3,6 +3,7 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Pill } from '@/components/ui/Pill'
 import { VenueCard } from '@/components/VenueCard'
+import { SearchIcon, ScaleIcon, MessageIcon, FilterIcon, TagIcon, MailIcon } from '@/components/icons'
 import { supabase } from '@/lib/supabase'
 
 const culturalFilters = [
@@ -18,21 +19,24 @@ const steps = [
   {
     title: 'Search & filter',
     desc: 'Browse NJ venues and filter by the cultural essentials. Mandap space, fire ceremony clearance, vegetarian kitchens, baraat access.',
+    icon: SearchIcon,
   },
   {
     title: 'Compare openly',
     desc: 'See real capacity and starting pricing up front, side by side. No calls required just to get a ballpark.',
+    icon: ScaleIcon,
   },
   {
     title: 'Inquire directly',
     desc: 'Send your event details straight to the venue. No middleman, no booking fees, no delays.',
+    icon: MessageIcon,
   },
 ]
 
 const features = [
-  { title: 'Cultural filters', desc: 'Filter by mandap, fire ceremony, vegetarian kitchen and more' },
-  { title: 'Transparent pricing', desc: 'See real pricing upfront, no surprises or hidden fees' },
-  { title: 'Direct inquiries', desc: 'Contact venues directly, no middleman, no delays' },
+  { title: 'Cultural filters', desc: 'Filter by mandap, fire ceremony, vegetarian kitchen and more', icon: FilterIcon },
+  { title: 'Transparent pricing', desc: 'See real pricing upfront, no surprises or hidden fees', icon: TagIcon },
+  { title: 'Direct inquiries', desc: 'Contact venues directly, no middleman, no delays', icon: MailIcon },
 ]
 
 export default async function Home() {
@@ -111,7 +115,10 @@ export default async function Home() {
           <div className="mt-12 grid gap-10 sm:grid-cols-3">
             {steps.map((step, i) => (
               <div key={step.title} className="text-center sm:text-left">
-                <span className="font-display text-2xl text-gold">0{i + 1}</span>
+                <div className="flex items-center justify-center gap-2.5 sm:justify-start">
+                  <step.icon className="h-5 w-5 text-gold" />
+                  <span className="font-display text-2xl text-gold">0{i + 1}</span>
+                </div>
                 <h3 className="mt-2 font-display text-lg font-bold text-plum">{step.title}</h3>
                 <p className="mt-2 text-[15px] leading-relaxed text-plum-light">{step.desc}</p>
               </div>
@@ -128,7 +135,10 @@ export default async function Home() {
             <div className="mt-12 grid gap-6 sm:grid-cols-3">
               {features.map((f) => (
                 <div key={f.title} className="rounded-sm border border-cream-border p-7 transition hover:border-plum-light">
-                  <h3 className="font-display text-lg font-bold text-plum">{f.title}</h3>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-plum-pale">
+                    <f.icon className="h-5 w-5 text-plum" />
+                  </div>
+                  <h3 className="mt-4 font-display text-lg font-bold text-plum">{f.title}</h3>
                   <p className="mt-2.5 text-[15px] leading-relaxed text-plum-light">{f.desc}</p>
                 </div>
               ))}
