@@ -34,8 +34,19 @@ export default async function AdminPage() {
           </form>
         </div>
 
+        {/* ---------- Overview ---------- */}
+        <div className="mt-6 flex flex-wrap gap-3 text-[12px]">
+          <span className="rounded-sm bg-gold-pale px-3 py-1.5 text-gold-ink">
+            {(claims?.length || 0) + (pending?.length || 0)} awaiting review
+          </span>
+          <span className="rounded-sm bg-plum-pale px-3 py-1.5 text-plum">
+            {live?.length || 0} live
+          </span>
+        </div>
+
         {/* ---------- Pending claims ---------- */}
-        <h2 className="mt-10 text-[11px] font-semibold uppercase tracking-wider text-ink">
+        <h2 className="mt-10 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-ink">
+          <span className="h-1.5 w-1.5 rounded-full bg-gold" />
           Pending claims {claims?.length ? `(${claims.length})` : ''}
         </h2>
         {(!claims || claims.length === 0) ? (
@@ -45,7 +56,7 @@ export default async function AdminPage() {
             {claims.map((claim) => {
               const claimant = claimUsers[claim.user_id]
               return (
-                <div key={claim.id} className="rounded-sm border border-cream-border bg-white p-5">
+                <div key={claim.id} className="rounded-sm border border-l-2 border-cream-border border-l-gold bg-white p-5">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <p className="font-medium text-ink">{claim.venues?.name || 'Venue no longer listed'}</p>
@@ -72,7 +83,8 @@ export default async function AdminPage() {
         )}
 
         {/* ---------- Pending venues ---------- */}
-        <h2 className="mt-12 text-[11px] font-semibold uppercase tracking-wider text-ink">
+        <h2 className="mt-12 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-ink">
+          <span className="h-1.5 w-1.5 rounded-full bg-gold" />
           Pending venue submissions {pending?.length ? `(${pending.length})` : ''}
         </h2>
 
@@ -88,7 +100,7 @@ export default async function AdminPage() {
                 : []
 
               return (
-                <div key={venue.id} className="rounded-sm border border-cream-border bg-white p-6">
+                <div key={venue.id} className="rounded-sm border border-l-2 border-cream-border border-l-gold bg-white p-6">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <h3 className="font-display text-lg font-medium text-ink">{venue.name}</h3>
@@ -140,7 +152,8 @@ export default async function AdminPage() {
         )}
 
         {/* ---------- Live venues ---------- */}
-        <h2 className="mt-12 text-[11px] font-semibold uppercase tracking-wider text-ink">
+        <h2 className="mt-12 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-ink">
+          <span className="h-1.5 w-1.5 rounded-full bg-plum" />
           Live venues {live?.length ? `(${live.length})` : ''}
         </h2>
 
@@ -159,8 +172,17 @@ export default async function AdminPage() {
                       </span>
                     )}
                   </p>
-                  <p className="text-[12px] text-muted">
-                    {venue.city}, {venue.state} · {venue.view_count || 0} views · {venue.owner_id ? 'Claimed' : 'Unclaimed'}
+                  <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-muted">
+                    <span>{venue.city}, {venue.state} · {venue.view_count || 0} views</span>
+                    <span
+                      className={
+                        venue.owner_id
+                          ? 'rounded-sm bg-plum-pale px-2 py-0.5 text-[10px] uppercase tracking-wide text-plum'
+                          : 'rounded-sm bg-cream-border/60 px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted'
+                      }
+                    >
+                      {venue.owner_id ? 'Claimed' : 'Unclaimed'}
+                    </span>
                   </p>
                 </div>
                 <div className="flex gap-2">
