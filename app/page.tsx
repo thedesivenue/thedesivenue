@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Pill } from '@/components/ui/Pill'
+import { VenueCard } from '@/components/VenueCard'
+import { supabase } from '@/lib/supabase'
 
 const culturalFilters = [
   'Mandap allowed',
@@ -33,7 +35,14 @@ const features = [
   { title: 'Direct inquiries', desc: 'Contact venues directly, no middleman, no delays' },
 ]
 
-export default function Home() {
+export default async function Home() {
+  const { data: featuredVenues } = await supabase
+    .from('venues')
+    .select('*, venue_features(*), venue_images(*), reviews(rating)')
+    .eq('is_approved', true)
+    .eq('is_premium', true)
+    .limit(3)
+
   return (
     <>
       <div className="bg-plum px-6 py-2.5 text-center text-[11px] font-semibold uppercase tracking-wider text-gold-light">
@@ -77,6 +86,22 @@ export default function Home() {
             <Pill key={filter}>{filter}</Pill>
           ))}
         </section>
+
+        {/* Featured venues */}
+        {featuredVenues && featuredVenues.length > 0 && (
+          <section className="border-b border-cream-border bg-white px-6 py-20">
+            <div className="mx-auto max-w-5xl">
+              <h2 className="text-center font-display text-3xl font-bold text-ink">
+                Featured venues
+              </h2>
+              <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {featuredVenues.map((venue) => (
+                  <VenueCard key={venue.id} venue={venue} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* How it works */}
         <section className="mx-auto max-w-5xl px-6 py-20">

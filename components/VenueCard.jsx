@@ -23,6 +23,12 @@ export function VenueCard({ venue, showFavorite = false, isFavorited = false }) 
         />
       )}
 
+      {venue.is_premium && (
+        <span className="absolute left-3 top-3 z-10 rounded-sm bg-gold px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-ink shadow-sm">
+          ★ Featured
+        </span>
+      )}
+
       <Link href={`/venues/${venue.id}`}>
         <div className="bg-motif relative h-44 overflow-hidden">
           {image ? (

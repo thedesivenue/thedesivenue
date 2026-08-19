@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { isAdminSession } from '@/lib/session'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { FEATURE_LABELS } from '@/lib/features'
-import { approveVenue, rejectVenue, unpublishVenue, deleteVenue, approveClaim, rejectClaim, logout } from './actions'
+import { approveVenue, rejectVenue, unpublishVenue, deleteVenue, togglePremium, approveClaim, rejectClaim, logout } from './actions'
 import { RejectButton } from '@/components/admin/RejectButton'
 import { ConfirmButton } from '@/components/admin/ConfirmButton'
 
@@ -151,12 +151,24 @@ export default async function AdminPage() {
             {live.map((venue) => (
               <div key={venue.id} className="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-cream-border bg-white px-5 py-3">
                 <div>
-                  <p className="font-medium text-ink">{venue.name}</p>
+                  <p className="font-medium text-ink">
+                    {venue.name}
+                    {venue.is_premium && (
+                      <span className="ml-2 rounded-sm bg-gold px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ink">
+                        ★ Featured
+                      </span>
+                    )}
+                  </p>
                   <p className="text-[12px] text-muted">
                     {venue.city}, {venue.state} · {venue.view_count || 0} views · {venue.owner_id ? 'Claimed' : 'Unclaimed'}
                   </p>
                 </div>
                 <div className="flex gap-2">
+                  <form action={togglePremium.bind(null, venue.id, !venue.is_premium)}>
+                    <button type="submit" className="rounded-sm border border-cream-border px-3 py-1.5 text-[12px] text-muted hover:text-plum">
+                      {venue.is_premium ? 'Unfeature' : 'Feature'}
+                    </button>
+                  </form>
                   <form action={unpublishVenue.bind(null, venue.id)}>
                     <button type="submit" className="rounded-sm border border-cream-border px-3 py-1.5 text-[12px] text-muted hover:text-plum">
                       Unpublish

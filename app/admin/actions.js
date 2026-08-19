@@ -43,6 +43,15 @@ export async function unpublishVenue(id) {
   revalidatePath('/venues')
 }
 
+export async function togglePremium(id, next) {
+  await requireAdminSession()
+  const { error } = await supabaseAdmin.from('venues').update({ is_premium: next }).eq('id', id)
+  if (error) throw new Error(error.message)
+  revalidatePath('/admin')
+  revalidatePath('/venues')
+  revalidatePath('/')
+}
+
 export async function deleteVenue(id) {
   await requireAdminSession()
   const { error } = await supabaseAdmin.from('venues').delete().eq('id', id)
