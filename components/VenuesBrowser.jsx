@@ -17,7 +17,7 @@ const sortOptions = [
 const selectClass =
   'rounded-sm border border-cream-border bg-white px-3.5 py-2.5 text-sm text-ink outline-none focus:border-plum'
 
-export function VenuesBrowser({ venues, showFavorite = false, favoritedIds = [] }) {
+export function VenuesBrowser({ venues, showFavorite = false, favoritedIds = [], hideCityFilter = false }) {
   const favoritedSet = new Set(favoritedIds)
   const [activeFilters, setActiveFilters] = useState([])
   const [search, setSearch] = useState('')
@@ -69,6 +69,8 @@ export function VenuesBrowser({ venues, showFavorite = false, favoritedIds = [] 
       return matchesSearch && matchesFilters && matchesCity && matchesGuests && matchesPrice
     })
     .sort((a, b) => {
+      const premiumDiff = (b.is_premium ? 1 : 0) - (a.is_premium ? 1 : 0)
+      if (premiumDiff !== 0) return premiumDiff
       if (sortBy === 'price-asc') return (a.min_price ?? Infinity) - (b.min_price ?? Infinity)
       if (sortBy === 'price-desc') return (b.min_price ?? -Infinity) - (a.min_price ?? -Infinity)
       if (sortBy === 'capacity-desc') return (b.max_capacity ?? 0) - (a.max_capacity ?? 0)
@@ -90,12 +92,14 @@ export function VenuesBrowser({ venues, showFavorite = false, favoritedIds = [] 
 
       {/* Refine: city, guests, price, sort */}
       <section className="flex flex-wrap items-center gap-3 border-b border-cream-border bg-white px-6 py-4">
-        <select value={city} onChange={(e) => setCity(e.target.value)} className={selectClass}>
-          <option value="">All cities</option>
-          {cities.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
+        {!hideCityFilter && (
+          <select value={city} onChange={(e) => setCity(e.target.value)} className={selectClass}>
+            <option value="">All cities</option>
+            {cities.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        )}
 
         <input
           type="number"

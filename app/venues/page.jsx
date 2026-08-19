@@ -1,8 +1,10 @@
+import Link from 'next/link'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { VenuesBrowser } from '@/components/VenuesBrowser'
 import { BackLink } from '@/components/ui/BackLink'
 import { supabase } from '@/lib/supabase'
+import { citySlug } from '@/lib/cities'
 import { createClient as createServerSupabase } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
@@ -35,6 +37,8 @@ export default async function VenuesPage() {
     favoritedIds = (favorites || []).map((f) => f.venue_id)
   }
 
+  const cities = [...new Set((data || []).map((v) => v.city).filter(Boolean))].sort()
+
   return (
     <>
       <Header />
@@ -42,6 +46,21 @@ export default async function VenuesPage() {
         <div className="px-6 pt-6">
           <BackLink href="/">Back to home</BackLink>
         </div>
+
+        {cities.length > 0 && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 px-6 pt-4 text-[13px] text-plum-light">
+            <span className="text-muted">Browse by city:</span>
+            {cities.map((city, i) => (
+              <span key={city}>
+                <Link href={`/venues/city/${citySlug(city)}`} className="hover:text-plum hover:underline">
+                  {city}
+                </Link>
+                {i < cities.length - 1 && <span className="text-muted">,</span>}
+              </span>
+            ))}
+          </div>
+        )}
+
         <VenuesBrowser venues={data || []} showFavorite={!!user} favoritedIds={favoritedIds} />
       </main>
       <Footer />

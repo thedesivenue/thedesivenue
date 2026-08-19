@@ -1,4 +1,7 @@
 import Link from 'next/link'
+import { citySlug } from '@/lib/cities'
+
+const CITIES = ['Edison', 'Iselin', 'Jersey City', 'Newark', 'Princeton', 'Colonia', 'Fords', 'Somerset']
 
 export function Footer() {
   return (
@@ -22,9 +25,14 @@ export function Footer() {
         </div>
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-wider text-ink">Serving</p>
-          <p className="mt-4 text-sm text-plum-light">
-            Edison · Iselin · Jersey City · Newark · Princeton · and the rest of New Jersey
-          </p>
+          <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-2 text-sm text-plum-light">
+            {CITIES.map((city) => (
+              <li key={city}>
+                <Link href={`/venues/city/${citySlug(city)}`} className="hover:text-plum">{city}</Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm text-plum-light">and the rest of New Jersey</p>
         </div>
       </div>
       <div className="bg-plum px-6 py-4 text-center text-[11px] uppercase tracking-wider text-gold-light/80">
