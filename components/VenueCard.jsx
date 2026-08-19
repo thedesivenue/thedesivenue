@@ -44,7 +44,7 @@ export function VenueCard({ venue, showFavorite = false, isFavorited = false }) 
         <div className="p-5">
           <h3 className="font-display text-lg font-bold text-ink">{venue.name}</h3>
           <p className="mt-1.5 text-[11px] uppercase tracking-wide text-muted">
-            {venue.city}, NJ · Up to {venue.max_capacity} guests
+            {venue.city}, NJ{venue.max_capacity ? ` · Up to ${venue.max_capacity} guests` : ''}
           </p>
 
           {reviews.length > 0 && (

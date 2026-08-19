@@ -144,13 +144,13 @@ export default function ListVenuePage() {
             <div className="mt-4 grid gap-4">
               <input name="name" placeholder="Venue name" required value={form.name} onChange={handleChange} className={inputClass} />
               <input name="address" placeholder="Street address" required value={form.address} onChange={handleChange} className={inputClass} />
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <input name="city" placeholder="City" required value={form.city} onChange={handleChange} className={inputClass} />
                 <input name="state" placeholder="State" required value={form.state} onChange={handleChange} className={inputClass} />
                 <input name="zip" placeholder="ZIP" required value={form.zip} onChange={handleChange} className={inputClass} />
               </div>
               <textarea name="description" placeholder="Describe your venue..." rows={4} value={form.description} onChange={handleChange} className={`${inputClass} resize-none`} />
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <input name="min_capacity" type="number" placeholder="Min guests" value={form.min_capacity} onChange={handleChange} className={inputClass} />
                 <input name="max_capacity" type="number" placeholder="Max guests" value={form.max_capacity} onChange={handleChange} className={inputClass} />
                 <input name="min_price" type="number" placeholder="Starting price ($)" value={form.min_price} onChange={handleChange} className={inputClass} />

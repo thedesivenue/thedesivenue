@@ -117,7 +117,9 @@ export default async function VenueDetailPage({ params }) {
               )}
             </div>
             <p className="mt-1.5 text-[15px] text-muted">
-              {venue.address}, {venue.city}, {venue.state} {venue.zip}
+              {[venue.address, venue.city, [venue.state, venue.zip].filter(Boolean).join(' ')]
+                .filter(Boolean)
+                .join(', ')}
             </p>
 
             {reviews.length > 0 && (
@@ -137,7 +139,13 @@ export default async function VenueDetailPage({ params }) {
               <div>
                 <p className="text-[13px] text-muted">Capacity</p>
                 <p className="mt-1 text-base font-medium text-ink">
-                  {venue.min_capacity}–{venue.max_capacity} guests
+                  {venue.min_capacity && venue.max_capacity
+                    ? `${venue.min_capacity}–${venue.max_capacity} guests`
+                    : venue.max_capacity
+                    ? `Up to ${venue.max_capacity} guests`
+                    : venue.min_capacity
+                    ? `${venue.min_capacity}+ guests`
+                    : 'Contact for capacity'}
                 </p>
               </div>
               <div>
