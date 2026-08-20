@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { bodoniModa, inter } from "@/lib/fonts";
 import { AuthHashHandler } from "@/components/AuthHashHandler";
 import "./globals.css";
@@ -45,6 +46,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <AuthHashHandler />
         {children}
+        <Analytics />
       </body>
     </html>
   );
