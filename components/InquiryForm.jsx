@@ -12,7 +12,7 @@ export function InquiryForm({ venueId, venueName }) {
   const [submitting, setSubmitting] = useState(false)
   const [userId, setUserId] = useState(null)
   const [form, setForm] = useState({
-    name: '', email: '', phone: '', event_date: '', guest_count: '', message: ''
+    name: '', email: '', phone: '', event_date: '', guest_count: '', message: '', company: ''
   })
 
   useEffect(() => {
@@ -31,6 +31,14 @@ export function InquiryForm({ venueId, venueName }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    // Honeypot — hidden from real visitors, bots tend to fill every field.
+    // Pretend success so it doesn't learn to skip this field next time.
+    if (form.company) {
+      setSubmitted(true)
+      return
+    }
+
     setSubmitting(true)
     // Generated client-side (rather than read back via .select()) since the
     // RLS insert policy on inquiries doesn't grant SELECT, and .insert().select()
@@ -91,6 +99,19 @@ export function InquiryForm({ venueId, venueName }) {
         <input name="event_date" type="date" value={form.event_date} onChange={handleChange} className={inputClass} />
         <input name="guest_count" type="number" placeholder="Number of guests" value={form.guest_count} onChange={handleChange} className={inputClass} />
         <textarea name="message" placeholder="Tell us about your event..." value={form.message} onChange={handleChange} rows={3} className={`${inputClass} resize-none`} />
+
+        {/* Honeypot — hidden from real visitors, bots tend to fill every field */}
+        <input
+          type="text"
+          name="company"
+          value={form.company}
+          onChange={handleChange}
+          autoComplete="off"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="absolute left-[-9999px] h-0 w-0 opacity-0"
+        />
+
         <button type="submit" disabled={submitting} className="mt-1 rounded-sm bg-plum py-3.5 text-[12px] font-semibold uppercase tracking-wider text-gold-light transition hover:bg-ink disabled:opacity-60">
           {submitting ? 'Sending…' : 'Send inquiry'}
         </button>

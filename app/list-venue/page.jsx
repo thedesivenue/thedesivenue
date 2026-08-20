@@ -23,6 +23,7 @@ const emptyForm = {
   max_capacity: '',
   min_price: '',
   parking: false,
+  company: '',
 }
 
 export default function ListVenuePage() {
@@ -203,6 +204,18 @@ export default function ListVenuePage() {
               ))}
             </div>
           </fieldset>
+
+          {/* Honeypot — hidden from real visitors, bots tend to fill every field */}
+          <input
+            type="text"
+            name="company"
+            value={form.company}
+            onChange={handleChange}
+            autoComplete="off"
+            tabIndex={-1}
+            aria-hidden="true"
+            className="absolute left-[-9999px] h-0 w-0 opacity-0"
+          />
 
           {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 

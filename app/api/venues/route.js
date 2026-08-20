@@ -9,6 +9,11 @@ const FEATURE_KEYS = new Set(CULTURAL_FEATURES.map((f) => f.key))
 export async function POST(request) {
   const formData = await request.formData()
 
+  // Honeypot: real visitors never see or fill this field.
+  if (formData.get('company')) {
+    return NextResponse.json({ id: null })
+  }
+
   const images = formData.getAll('images').filter((f) => f instanceof File && f.size > 0)
   const imageError = validateImages(images)
   if (imageError) return NextResponse.json({ error: imageError }, { status: 400 })
