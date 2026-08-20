@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { FEATURE_LABELS } from '@/lib/features'
 import { StarRating } from '@/components/ui/StarRating'
 import { FavoriteButton } from '@/components/FavoriteButton'
@@ -32,8 +33,13 @@ export function VenueCard({ venue, showFavorite = false, isFavorited = false }) 
       <Link href={`/venues/${venue.id}`}>
         <div className="bg-motif relative h-44 overflow-hidden">
           {image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={image} alt={venue.name} className="h-full w-full object-cover" />
+            <Image
+              src={image}
+              alt={venue.name}
+              fill
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover"
+            />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
               <span className="font-display text-3xl text-plum/20">✦</span>

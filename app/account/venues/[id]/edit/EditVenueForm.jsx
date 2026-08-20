@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Pill } from '@/components/ui/Pill'
@@ -115,8 +116,7 @@ export function EditVenueForm({ venue }) {
               <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {venue.venue_images.map((img) => (
                   <div key={img.id} className="group relative h-24 overflow-hidden rounded-sm border border-cream-border">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img.url} alt="" className="h-full w-full object-cover" />
+                    <Image src={img.url} alt="" fill sizes="120px" className="object-cover" />
                     <button
                       type="button"
                       onClick={() => removeVenueImage(venue.id, img.id)}

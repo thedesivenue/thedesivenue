@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 export function ImageGallery({ images, name }) {
   const [active, setActive] = useState(0)
@@ -15,9 +16,8 @@ export function ImageGallery({ images, name }) {
 
   return (
     <div>
-      <div className="flex h-64 items-center justify-center overflow-hidden bg-plum-pale sm:h-96">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={images[active].url} alt={name} className="h-full w-full object-cover" />
+      <div className="relative h-64 overflow-hidden bg-plum-pale sm:h-96">
+        <Image src={images[active].url} alt={name} fill sizes="100vw" priority className="object-cover" />
       </div>
 
       {images.length > 1 && (
@@ -26,12 +26,11 @@ export function ImageGallery({ images, name }) {
             <button
               key={img.id ?? img.url}
               onClick={() => setActive(i)}
-              className={`h-16 w-24 flex-none overflow-hidden rounded-sm border transition ${
+              className={`relative h-16 w-24 flex-none overflow-hidden rounded-sm border transition ${
                 i === active ? 'border-plum' : 'border-cream-border opacity-70 hover:opacity-100'
               }`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img.url} alt="" className="h-full w-full object-cover" />
+              <Image src={img.url} alt="" fill sizes="96px" className="object-cover" />
             </button>
           ))}
         </div>
