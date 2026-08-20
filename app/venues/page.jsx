@@ -15,7 +15,9 @@ export const metadata = {
 
 export const dynamic = 'force-dynamic'
 
-export default async function VenuesPage() {
+export default async function VenuesPage({ searchParams }) {
+  const { q } = await searchParams
+
   const { data, error } = await supabase
     .from('venues')
     .select(`
@@ -61,7 +63,7 @@ export default async function VenuesPage() {
           </div>
         )}
 
-        <VenuesBrowser venues={data || []} showFavorite={!!user} favoritedIds={favoritedIds} />
+        <VenuesBrowser venues={data || []} showFavorite={!!user} favoritedIds={favoritedIds} initialSearch={q || ''} />
       </main>
       <Footer />
     </>

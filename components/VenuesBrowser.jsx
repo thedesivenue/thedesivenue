@@ -17,10 +17,10 @@ const sortOptions = [
 const selectClass =
   'rounded-sm border border-cream-border bg-white px-3.5 py-2.5 text-sm text-ink outline-none focus:border-plum'
 
-export function VenuesBrowser({ venues, showFavorite = false, favoritedIds = [], hideCityFilter = false }) {
+export function VenuesBrowser({ venues, showFavorite = false, favoritedIds = [], hideCityFilter = false, initialSearch = '' }) {
   const favoritedSet = new Set(favoritedIds)
   const [activeFilters, setActiveFilters] = useState([])
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(initialSearch)
   const [city, setCity] = useState('')
   const [minGuests, setMinGuests] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
