@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { FEATURE_LABELS } from '@/lib/features'
 import { StarRating } from '@/components/ui/StarRating'
 import { FavoriteButton } from '@/components/FavoriteButton'
+import { placeholderVariant } from '@/lib/placeholder'
 
 export function VenueCard({ venue, showFavorite = false, isFavorited = false }) {
   const image = venue.venue_images?.[0]?.url
@@ -15,7 +16,7 @@ export function VenueCard({ venue, showFavorite = false, isFavorited = false }) 
   const avgRating = reviews.length ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0
 
   return (
-    <div className="group relative overflow-hidden rounded-sm border border-cream-border bg-white transition hover:border-plum-light hover:shadow-lg hover:shadow-plum/5">
+    <div className="group relative overflow-hidden rounded-sm border border-cream-border bg-white transition-all duration-300 hover:-translate-y-1 hover:border-plum-light hover:shadow-lg hover:shadow-plum/10">
       {showFavorite && (
         <FavoriteButton
           venueId={venue.id}
@@ -31,17 +32,17 @@ export function VenueCard({ venue, showFavorite = false, isFavorited = false }) 
       )}
 
       <Link href={`/venues/${venue.id}`}>
-        <div className="bg-motif relative h-44 overflow-hidden">
+        <div className={`relative h-44 overflow-hidden ${placeholderVariant(venue.id)}`}>
           {image ? (
             <Image
               src={image}
               alt={venue.name}
               fill
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-              className="object-cover"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center">
+            <div className="flex h-full w-full items-center justify-center transition-transform duration-500 group-hover:scale-110">
               <span className="font-display text-3xl text-plum/20">✦</span>
             </div>
           )}
