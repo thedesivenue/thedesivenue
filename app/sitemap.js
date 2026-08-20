@@ -11,7 +11,7 @@ export default async function sitemap() {
 
   const cities = [...new Set((venues || []).map((v) => v.city).filter(Boolean))]
 
-  const staticRoutes = ['', '/venues', '/list-venue', '/login', '/signup'].map((path) => ({
+  const staticRoutes = ['', '/venues', '/list-venue', '/login', '/signup', '/contact', '/privacy', '/terms'].map((path) => ({
     url: `${SITE_URL}${path}`,
     changeFrequency: path === '' || path === '/venues' ? 'daily' : 'monthly',
     priority: path === '' ? 1 : 0.6,

@@ -21,6 +21,7 @@ export function Footer() {
           <ul className="mt-4 space-y-2.5 text-sm text-plum-light">
             <li><Link href="/venues" className="hover:text-plum">Browse venues</Link></li>
             <li><Link href="/list-venue" className="hover:text-plum">List your venue</Link></li>
+            <li><Link href="/contact" className="hover:text-plum">Contact us</Link></li>
           </ul>
         </div>
         <div>
@@ -35,8 +36,10 @@ export function Footer() {
           <p className="mt-3 text-sm text-plum-light">and the rest of New Jersey</p>
         </div>
       </div>
-      <div className="bg-plum px-6 py-4 text-center text-[11px] uppercase tracking-wider text-gold-light/80">
-        © {new Date().getFullYear()} The Desi Venue · Built for the Indian community in NJ
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 bg-plum px-6 py-4 text-center text-[11px] uppercase tracking-wider text-gold-light/80">
+        <span>© {new Date().getFullYear()} The Desi Venue · Built for the Indian community in NJ</span>
+        <Link href="/privacy" className="hover:text-gold-light">Privacy</Link>
+        <Link href="/terms" className="hover:text-gold-light">Terms</Link>
       </div>
     </footer>
   )
