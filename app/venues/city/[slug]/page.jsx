@@ -3,10 +3,12 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { VenuesBrowser } from '@/components/VenuesBrowser'
 import { BackLink } from '@/components/ui/BackLink'
+import { JsonLd } from '@/components/JsonLd'
 import { supabase } from '@/lib/supabase'
 import { createClient as createServerSupabase } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { citySlug, slugToCityFilter } from '@/lib/cities'
+import { venueListJsonLd } from '@/lib/jsonld'
 
 export const revalidate = 3600
 
@@ -61,6 +63,7 @@ export default async function CityVenuesPage({ params }) {
 
   return (
     <>
+      <JsonLd data={venueListJsonLd(venues, `https://www.thedesivenue.com/venues/city/${slug}`)} />
       <Header />
       <main className="flex-1 bg-cream">
         <div className="px-6 pt-6">

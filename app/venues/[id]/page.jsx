@@ -9,6 +9,8 @@ import { StarRating } from '@/components/ui/StarRating'
 import { ReviewForm } from '@/components/ReviewForm'
 import { FavoriteButton } from '@/components/FavoriteButton'
 import { ClaimForm } from '@/components/ClaimForm'
+import { JsonLd } from '@/components/JsonLd'
+import { venueJsonLd } from '@/lib/jsonld'
 import { supabase } from '@/lib/supabase'
 import { createClient as createServerSupabase } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
@@ -93,6 +95,7 @@ export default async function VenueDetailPage({ params }) {
 
   return (
     <>
+      <JsonLd data={venueJsonLd(venue, reviews)} />
       <Header />
       <main className="flex-1 bg-cream">
 

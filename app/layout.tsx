@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { bodoniModa, inter } from "@/lib/fonts";
 import { AuthHashHandler } from "@/components/AuthHashHandler";
+import { JsonLd } from "@/components/JsonLd";
+import { organizationJsonLd } from "@/lib/jsonld";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -44,6 +46,7 @@ export default function RootLayout({
       className={`${bodoniModa.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <JsonLd data={organizationJsonLd()} />
         <AuthHashHandler />
         {children}
         <Analytics />
